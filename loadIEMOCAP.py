@@ -51,7 +51,7 @@ class IEMOCAP(DGLDataset):
         text = np.asarray(x1)
         audio = np.asarray(x2)
         video = np.asarray(x3)
-        output = np.hstack([text])
+        output = np.hstack([text, audio, video])
         return output    
 
 
@@ -70,9 +70,9 @@ class IEMOCAP(DGLDataset):
         x1.append(sim)
         x2.append(nodeStart)
         x3.append(nodeStart+numUtterance-1)
-        x2.append(nodeStart+numUtterance-1)
-        x3.append(nodeStart)
-        x1.append(sim)
+        # x2.append(nodeStart+numUtterance-1)
+        # x3.append(nodeStart)
+        # x1.append(sim)
         return x1, x2, x3
 
     def process(self):

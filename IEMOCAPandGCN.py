@@ -1,5 +1,4 @@
 import argparse
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -22,7 +21,6 @@ class GCN(nn.Module):
         )
         self.layers.append(dglnn.GraphConv(hid_size, 16))
         self.linear = nn.Linear(16, out_size)
-        self.
         self.dropout = nn.Dropout(0.5)
 
     def forward(self, g, features):
@@ -47,7 +45,8 @@ def evaluate(g, features, labels, mask, model):
 def train(g, features, labels, masks, model):
     # define train/val samples, loss function and optimizer
     train_mask = masks[0]
-    loss_fcn = nn.CrossEntropyLoss()
+    # loss_fcn = nn.CrossEntropyLoss()
+    loss_fcn = FocalLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=5e-4)
 
     # training loop
@@ -84,7 +83,7 @@ if __name__ == "__main__":
     # create GCN model
     in_size = features.shape[1]
     out_size = len(data.num_classes)
-    model = GCN(in_size, 64, out_size).to(device)
+    model = GCN(in_size, 128, out_size).to(device)
     print(model)
     # model training
     print("Training...")
