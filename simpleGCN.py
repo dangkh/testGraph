@@ -50,6 +50,9 @@ def train(g, features, labels, masks, model):
     for epoch in range(100):
         model.train()
         logits = model(g, features)
+        print(logits[train_mask])
+        print(labels[train_mask])
+        stop
         loss = loss_fcn(logits[train_mask], labels[train_mask])
         optimizer.zero_grad()
         loss.backward()
@@ -84,10 +87,8 @@ if __name__ == "__main__":
         raise ValueError("Unknown dataset: {}".format(args.dataset))
 
     g = data[0]
-    print(g.num_edges())
-    print(g.edges())
-    stop
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = 'cpu'
     g = g.int().to(device)
     features = g.ndata["feat"]
     labels = g.ndata["label"]
@@ -100,9 +101,12 @@ if __name__ == "__main__":
     print(model)
     # model training
     print("Training...")
+    print(features.shape)
     train(g, features, labels, masks, model)
 
     # test the model
     print("Testing...")
+    print(features.shape)
+    stop
     acc = evaluate(g, features, labels, masks[2], model)
     print("Test accuracy {:.4f}".format(acc))
