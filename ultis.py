@@ -3,7 +3,7 @@ import torch
 import numpy as np 
 from torch import nn
 import torch.nn.functional as F
-seed = 27350
+seed = 1001
 
 def seed_everything(seed=seed):
     random.seed(seed)
@@ -16,7 +16,7 @@ def seed_everything(seed=seed):
 
 cos = nn.CosineSimilarity(dim=0, eps=1e-6)
 def featureSimilarity(v1, v2):
-    similar = torch.acos(cos(v1, v2))/ np.pi
+    similar = 1.0 - torch.acos(cos(v1, v2))/ np.pi
     return similar
 
 def convertNP2Tensor(listV):

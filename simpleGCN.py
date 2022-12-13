@@ -50,9 +50,6 @@ def train(g, features, labels, masks, model):
     for epoch in range(100):
         model.train()
         logits = model(g, features)
-        print(logits[train_mask])
-        print(labels[train_mask])
-        stop
         loss = loss_fcn(logits[train_mask], labels[train_mask])
         optimizer.zero_grad()
         loss.backward()
@@ -107,6 +104,5 @@ if __name__ == "__main__":
     # test the model
     print("Testing...")
     print(features.shape)
-    stop
     acc = evaluate(g, features, labels, masks[2], model)
     print("Test accuracy {:.4f}".format(acc))

@@ -47,11 +47,12 @@ class IEMOCAP(DGLDataset):
         self.process()
 
 
-    def extractNode(self, x1, x2, x3):
+    def extractNode(self, x1, x2, x3, x4):
         text = np.asarray(x1)
         audio = np.asarray(x2)
         video = np.asarray(x3)
-        output = np.hstack([text, audio, video])
+        speakers = torch.FloatTensor([[1]*5 if x=='M' else [0]*5 for x in x4])
+        output = np.hstack([text, audio, video, speakers])
         return output    
 
 
@@ -63,16 +64,23 @@ class IEMOCAP(DGLDataset):
             x1.append(sim)
             x2.append(nodeStart+ii)
             x3.append(nodeStart+ii+1)
-            x2.append(nodeStart+ii+1)
-            x3.append(nodeStart+ii)
-            x1.append(sim)
+            # x2.append(nodeStart+ii+1)
+            # x3.append(nodeStart+ii)
+            # x1.append(sim)
         sim = featureSimilarity(datas[0], datas[-1])
         x1.append(sim)
         x2.append(nodeStart)
         x3.append(nodeStart+numUtterance-1)
-        # x2.append(nodeStart+numUtterance-1)
-        # x3.append(nodeStart)
-        # x1.append(sim)
+        for ii in range(numUtterance - 1):
+            for jj in range(ii+1, numUtterance):
+                sim = featureSimilarity(datas[ii], datas[jj])
+                alpha = 1.0
+                x1.append(alpha * sim)
+                x2.append(nodeStart+ii)
+                x3.append(nodeStart+jj)
+                x2.append(nodeStart+jj)
+                x3.append(nodeStart+ii)
+                x1.append(alpha * sim)
         return x1, x2, x3
 
     def process(self):
@@ -83,8 +91,10 @@ class IEMOCAP(DGLDataset):
         numNodeTrain = sum([len(self.videoText[x]) for x in self.trainVid])
         numNodeTest = sum([len(self.videoText[x]) for x in self.testVid])
         numberNode = numNodeTest + numNodeTrain
-        node_featuresTrain = np.vstack([self.extractNode(self.videoText[x], self.videoVisual[x], self.videoAudio[x]) for x in self.trainVid])
-        node_featuresTest = np.vstack([self.extractNode(self.videoText[x], self.videoVisual[x], self.videoAudio[x]) for x in self.testVid])
+        node_featuresTrain = np.vstack([self.extractNode(self.videoText[x], self.videoVisual[x], \
+            self.videoAudio[x], self.videoSpeakers[x]) for x in self.trainVid])
+        node_featuresTest = np.vstack([self.extractNode(self.videoText[x], self.videoVisual[x], \
+            self.videoAudio[x], self.videoSpeakers[x]) for x in self.testVid])
         node_features = np.vstack([node_featuresTrain, node_featuresTest])
         node_labelTrain = np.hstack([np.asarray(self.videoLabels[x]) for x in self.trainVid])
         node_labelTest = np.hstack([np.asarray(self.videoLabels[x]) for x in self.testVid])
