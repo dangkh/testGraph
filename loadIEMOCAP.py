@@ -96,6 +96,8 @@ class IEMOCAP(DGLDataset):
         node_featuresTest = np.vstack([self.extractNode(self.videoText[x], self.videoVisual[x], \
             self.videoAudio[x], self.videoSpeakers[x]) for x in self.testVid])
         node_features = np.vstack([node_featuresTrain, node_featuresTest])
+        # feature normalization
+        node_features = norm(node_features)
         node_labelTrain = np.hstack([np.asarray(self.videoLabels[x]) for x in self.trainVid])
         node_labelTest = np.hstack([np.asarray(self.videoLabels[x]) for x in self.testVid])
         node_labels = np.hstack([node_labelTrain, node_labelTest])

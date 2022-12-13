@@ -61,3 +61,9 @@ class FocalLoss(nn.Module):
             return fl.mean()
         else:
             return fl.sum()
+
+def norm(features):
+    meanMat = np.mean(features, axis=0, keepdims=True)
+    stdMat = np.std(features, axis=0, keepdims=True)
+    newFeatures = (features - meanMat) / stdMat
+    return newFeatures
