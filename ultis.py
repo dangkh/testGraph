@@ -69,3 +69,62 @@ def norm(features):
     minMat = np.min(newFeatures, axis = 0, keepdims=True)
     newFeatures = newFeatures- minMat
     return newFeatures
+
+def auxilary(v):
+    vv = v.clone().detach().cpu()
+    listR = torch.zeros(6, 6)
+    for ii in range(len(vv)):
+        tmp = torch.unsqueeze(vv[ii], dim = 0)
+        listR += tmp.T @ tmp
+    mean = torch.sqrt(listR / len(vv))
+    invMean = torch.linalg.inv(mean)
+    vnew = v @ invMean.cuda()
+    return vnew
+
+def vis(info):
+    print('Visualize')
+    X0, y0 = info
+    visData = [[X0, y0]]
+    embeddings = visData[0][0]
+    tsne = TSNE(n_components=2)
+    transformed = tsne.fit_transform(embeddings)
+
+    palette = sns.color_palette("bright", len(np.unique(y0)))
+    g = sns.scatterplot(
+        x=transformed[:,0],
+        y=transformed[:,1],
+        hue=visData[0][1],
+        legend='full',
+        palette=palette
+    )
+    # _lg = g.get_legend()
+    # _lg.remove()
+    plt.show()
+
+def vis2(info):
+    print('Visualize')
+    X0, y0 = info
+    visData = [[X0, y0]]
+    embeddings = visData[0][0]
+    tsne = TSNE(n_components=3)
+    transformed = tsne.fit_transform(embeddings)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    cmap = ListedColormap(sns.color_palette().as_hex())
+    sc = ax.scatter(transformed[:, 0], transformed[:, 1], transformed[:, 2], s=10, c=visData[0][1], marker='o', cmap=cmap, alpha=1)
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+    plt.show()
+
+def evaluate(g, features, labels, mask, model):
+    model.eval()
+    with torch.no_grad():
+        logits = model(g, features)
+        # logits = auxilary(logits)
+        logits = logits[mask]
+        labels = labels[mask]
+        _, indices = torch.max(logits, dim=1)
+        correct = torch.sum(indices == labels)
+        return correct.item() * 100.0 / len(labels)

@@ -29,15 +29,6 @@ class GCN(nn.Module):
             h = layer(g, h)
         return h
 
-def evaluate(g, features, labels, mask, model):
-    model.eval()
-    with torch.no_grad():
-        logits = model(g, features)
-        logits = logits[mask]
-        labels = labels[mask]
-        _, indices = torch.max(logits, dim=1)
-        correct = torch.sum(indices == labels)
-        return correct.item() * 1.0 / len(labels)
 
 def train(g, features, labels, masks, model):
     # define train/val samples, loss function and optimizer

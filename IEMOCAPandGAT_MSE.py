@@ -17,7 +17,6 @@ torch.set_default_dtype(torch.double)
 
 # seed_everything(seed=10001)
 
-
 def convertX2Binary(labels):
     listLabel = []
     for ll in labels:
@@ -27,28 +26,6 @@ def convertX2Binary(labels):
     r = torch.stack(listLabel )
     return r.cuda()
 
-class GCN(nn.Module):
-    def __init__(self, in_size, hid_size, out_size):
-        super().__init__()
-        gcv = [in_size, 512, 128, 32]
-        self.layers = nn.ModuleList()
-        # two-layer GCN
-        for ii in range(len(gcv)-1):
-            self.layers.append(
-                dglnn.GraphConv(gcv[ii], gcv[ii+1], activation=F.relu)
-            )
-        # self.layers.append(dglnn.GraphConv(hid_size, 16))
-        self.linear = nn.Linear(gcv[-1], out_size)
-        self.dropout = nn.Dropout(0.5)
-
-    def forward(self, g, features):
-        h = features
-        for i, layer in enumerate(self.layers):
-            if i != 0:
-                h = self.dropout(h)
-            h = layer(g, h)
-        h = self.linear(h)
-        return h
 
 class GAT(nn.Module):
     def __init__(self, in_size, hid_size, out_size):
@@ -74,59 +51,6 @@ class GAT(nn.Module):
         h = torch.reshape(h, (len(h), -1))
         h = self.linear(h)
         return h
-
-def auxilary(v):
-    vv = v.clone().detach().cpu()
-    listR = torch.zeros(6, 6)
-    for ii in range(len(vv)):
-        tmp = torch.unsqueeze(vv[ii], dim = 0)
-        listR += tmp.T @ tmp
-    # a = listR / len(vv)
-    # b = a.numpy()
-    # b = np.sqrt(np.abs(b))
-    mean = listR / len(vv)
-    # mean = torch.from_numpy(b)
-    invMean = torch.linalg.inv(mean)
-    vnew = v @ invMean.cuda()
-    return vnew
-
-
-def vis(info):
-    print('Visualize')
-    X0, y0 = info
-    visData = [[X0, y0]]
-    embeddings = visData[0][0]
-    tsne = TSNE(n_components=2)
-    transformed = tsne.fit_transform(embeddings)
-
-    palette = sns.color_palette("bright", len(np.unique(y0)))
-    g = sns.scatterplot(
-        x=transformed[:,0],
-        y=transformed[:,1],
-        hue=visData[0][1],
-        legend='full',
-        palette=palette
-    )
-    # _lg = g.get_legend()
-    # _lg.remove()
-    plt.show()
-
-def vis2(info):
-    print('Visualize')
-    X0, y0 = info
-    visData = [[X0, y0]]
-    embeddings = visData[0][0]
-    tsne = TSNE(n_components=3)
-    transformed = tsne.fit_transform(embeddings)
-
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-    cmap = ListedColormap(sns.color_palette().as_hex())
-    sc = ax.scatter(transformed[:, 0], transformed[:, 1], transformed[:, 2], s=10, c=visData[0][1], marker='o', cmap=cmap, alpha=1)
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
-    plt.show()
 
 
 def evaluate(g, features, labels, mask, model, visual = False, originalLabel = None):

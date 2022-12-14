@@ -12,30 +12,6 @@ torch.set_default_dtype(torch.double)
 
 # seed_everything(seed=10001)
 
-
-class GCN(nn.Module):
-    def __init__(self, in_size, hid_size, out_size):
-        super().__init__()
-        gcv = [in_size, 512, 128, 32]
-        self.layers = nn.ModuleList()
-        # two-layer GCN
-        for ii in range(len(gcv)-1):
-            self.layers.append(
-                dglnn.GraphConv(gcv[ii], gcv[ii+1], activation=F.relu)
-            )
-        # self.layers.append(dglnn.GraphConv(hid_size, 16))
-        self.linear = nn.Linear(gcv[-1], out_size)
-        self.dropout = nn.Dropout(0.5)
-
-    def forward(self, g, features):
-        h = features
-        for i, layer in enumerate(self.layers):
-            if i != 0:
-                h = self.dropout(h)
-            h = layer(g, h)
-        h = self.linear(h)
-        return h
-
 class GAT(nn.Module):
     def __init__(self, in_size, hid_size, out_size):
         super().__init__()
@@ -61,27 +37,6 @@ class GAT(nn.Module):
         h = self.linear(h)
         return h
 
-def auxilary(v):
-    vv = v.clone().detach().cpu()
-    listR = torch.zeros(6, 6)
-    for ii in range(len(vv)):
-        tmp = torch.unsqueeze(vv[ii], dim = 0)
-        listR += tmp.T @ tmp
-    mean = torch.sqrt(listR / len(vv))
-    invMean = torch.linalg.inv(mean)
-    vnew = v @ invMean.cuda()
-    return vnew
-
-def evaluate(g, features, labels, mask, model):
-    model.eval()
-    with torch.no_grad():
-        logits = model(g, features)
-        # logits = auxilary(logits)
-        logits = logits[mask]
-        labels = labels[mask]
-        _, indices = torch.max(logits, dim=1)
-        correct = torch.sum(indices == labels)
-        return correct.item() * 100.0 / len(labels)
 
 def train(g, features, labels, masks, model):
     # define train/val samples, loss function and optimizer
@@ -109,9 +64,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--2direction', action='store_true', default=False, help='edge direction type')
+    parser.add_argument('--numEpoch', help='number of epochs', default=50, type=int)
+    parser.add_argument('--seed', help='type of seed: random vs fix', default='random')
+    parser.add_argument('--lr', help='learning rate', default=0.003, type=float)
+    parser.add_argument('--weight_decay', help='weight decay', default=0.00001, type=float)
+    parser.add_argument('--missingPercentage', help='percentage of missing utterance in MM data', default=10, type=int)
+    parser.add_argument('--reconstruct', action='store_true', default=False, help='edge direction type')
+    parser.add_argument('--numTest', help='number of test', default=10, type=int)
     args = parser.parse_args()
     print(f"Training with DGL built-in GraphConv module.")
 
+    info = {
+            'numEpoch': args.numEpoch,
+            'lr': args.lr, 
+            'weight_decay': args.weight_decay
+        }
     
     # g = dgl.add_self_loop(g)
     if os.path.isfile('./graphIEMOCAP.dgl'):
@@ -130,7 +97,6 @@ if __name__ == "__main__":
     # create GCN model
     in_size = features.shape[1]
     out_size = 6
-    # model = GCN(in_size, 128, out_size).to(device)
     model = GAT(in_size, 128, out_size).to(device)
     print(model)
     # model training
