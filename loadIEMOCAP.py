@@ -8,44 +8,48 @@ import random
 from ultis import *
 import pickle
 
-def genMissMultiModal(matSize, index):
+
+def missingParam(percent):
+    al, be , ga = 0, 0, 0
+    for aa in range(20):
+        for bb in range(20):
+            for gg in range(20):
+                if (aa+bb+gg) != 0:
+                    if abs(((bb*3 + gg * 6) * 100.0 / (aa*3 + bb*9 + gg*6)) - percent) <= 1.0:
+                        return aa, bb, gg
+    return al, be, ga
+
+
+def genMissMultiModal(matSize, percent):
+    index = (percent-10) // 10
     types = np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
-    typeExtend = [7, 3, 1, 0, 0, 0]
-    percentIndex = [10, 20, 30, 40, 50, 60]
     missPercent = 0
     batch_size = 1
     if matSize[0] != len(types[0]):
         return None
-    if typeExtend[index] > 0:
-        missType = np.vstack([types, np.asarray([[0, 0, 0]] * typeExtend[index])])
-    elif typeExtend[index] == -2:
-        missType = types
-    elif typeExtend[index] == -3:
-        missType = np.vstack([types, np.asarray([[0, 0, 0]] * 2), dtypes])
-    else:
-        missType = np.vstack([types, np.asarray([[0, 0, 0]])])
-    listmask = []
-    for batchId in range(batch_size):        
-        counter = 0
-        while np.abs(missPercent - percentIndex[index]) > 1.0:
-            mat = np.zeros((matSize[0], matSize[-1]))
-            for ii in range(matSize[-1]):
-                tmp = random.randint(0, len(missType)-1)
-                mat[:,ii] = missType[tmp]
-            missPercent = mat.sum() / (matSize[0] * matSize[-1]) * 100
-            if np.abs(missPercent - percentIndex[index]) < 1.0:
-                listmask.append(mat)
-                print(missPercent)
-                missPercent = 0
-                break
-    return listmask
+    al, be, ga = missingParam(percent)
+    listMask = []
+    masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]])]
+    for mask, num in ([0, al], [1, be], [2, ga]):
+        if num > 0:
+            listMask.append(np.repeat(masks[mask], num, axis = 0))
+    missType = np.vstack(listMask)
+    counter = 0
+    while np.abs(missPercent - percent) > 1.0:
+        mat = np.zeros((matSize[0], matSize[-1]))
+        for ii in range(matSize[-1]):
+            tmp = random.randint(0, len(missType)-1)
+            mat[:,ii] = missType[tmp]
+        missPercent = mat.sum() / (matSize[0] * matSize[-1]) * 100
+        if np.abs(missPercent - percent) < 1.7:
+            return mat
+    return np.zeros((matSize[0], matSize[-1]))
 
 class IEMOCAP(DGLDataset):
-    def __init__(self, missing = 0):
+    def __init__(self, missing = 0, edgeType = 0):
+        self.missing = missing
+        self.edgeType = edgeType
         super().__init__(name='IEMOCAP_DGL')
-        self.missingPercentage = missing
-        self.genMissing(missing)
-        self.process()
 
 
     def extractNode(self, x1, x2, x3, x4):
@@ -53,35 +57,50 @@ class IEMOCAP(DGLDataset):
         audio = np.asarray(x2)
         video = np.asarray(x3)
         speakers = torch.FloatTensor([[1]*5 if x=='M' else [0]*5 for x in x4])
+        # 100, 342, 1582, 5
         output = np.hstack([text, audio, video, speakers])
         return output    
 
 
     def extractEdge(self, datas, nodeStart):
         numUtterance = len(datas)
+        if self.missing > 0:
+            self.missingMask = genMissMultiModal((3, numUtterance), self.missing)
+            for ii in range(numUtterance):
+                currentFeatures = datas[ii]
+                text = currentFeatures[:100]
+                audio = currentFeatures[100: 442]
+                video = currentFeatures[442: 442+1582]
+                if self.missingMask[0][ii] == 1:
+                    text[:] = 0
+                if self.missingMask[1][ii] == 1:
+                    audio[:] = 0
+                if self.missingMask[2][ii] == 1:
+                    video[:] = 0
         x1, x2, x3 = [], [], []
         for ii in range(numUtterance - 1):
-            sim = featureSimilarity(datas[ii], datas[ii+1])
+            sim = 1
+            if self.edgeType == 0:
+                sim = featureSimilarity(datas[ii], datas[ii+1])
             x1.append(sim)
             x2.append(nodeStart+ii)
             x3.append(nodeStart+ii+1)
-            # x2.append(nodeStart+ii+1)
-            # x3.append(nodeStart+ii)
-            # x1.append(sim)
+
         sim = featureSimilarity(datas[0], datas[-1])
         x1.append(sim)
         x2.append(nodeStart)
         x3.append(nodeStart+numUtterance-1)
         for ii in range(numUtterance - 1):
             for jj in range(ii+1, numUtterance):
-                sim = featureSimilarity(datas[ii], datas[jj])
-                alpha = 1.0
-                x1.append(alpha * sim)
+                sim = 1
+                if self.edgeType == 0:
+                    sim = featureSimilarity(datas[ii], datas[jj])
+                x1.append(sim)
                 x2.append(nodeStart+ii)
                 x3.append(nodeStart+jj)
                 x2.append(nodeStart+jj)
                 x3.append(nodeStart+ii)
-                x1.append(alpha * sim)
+                x1.append(sim)
         return x1, x2, x3
 
     def process(self):
@@ -99,6 +118,7 @@ class IEMOCAP(DGLDataset):
         node_features = np.vstack([node_featuresTrain, node_featuresTest])
         # feature normalization
         node_features = norm(node_features)
+        
         node_labelTrain = np.hstack([np.asarray(self.videoLabels[x]) for x in self.trainVid])
         node_labelTest = np.hstack([np.asarray(self.videoLabels[x]) for x in self.testVid])
         node_labels = np.hstack([node_labelTrain, node_labelTest])
@@ -143,16 +163,6 @@ class IEMOCAP(DGLDataset):
     def __len__(self):
         return 1
 
-
-    def genMissing(self, typeMissing = 10):
-        mm = genMissMultiModal((3, 10), 0)
-        mm = np.asarray(mm[0])
-        print(f'missing percent: {mm.sum()*1.0 / (mm.shape[0] * mm.shape[1])}')
-        missingGraph = None
-        stop
-        return missingGraph
-
-
     def reconstruct(self, typeReconstruct):
         pass
 
@@ -160,6 +170,5 @@ class IEMOCAP(DGLDataset):
 # print(trainset[1][0].shape)
 
 # trainsetDGL = IEMOCAP()
-for ii in range(10, 40, 10):
-    index = (ii-10) // 10
-    genMissMultiModal((3, 10), index)
+# for ii in range(10, 70, 10):
+#     genMissMultiModal((3, 8), ii)

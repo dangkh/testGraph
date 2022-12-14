@@ -66,8 +66,8 @@ def norm(features):
     meanMat = np.mean(features, axis=0, keepdims=True)
     stdMat = np.std(features, axis=0, keepdims=True)
     newFeatures = (features - meanMat) / stdMat
-    minMat = np.min(newFeatures, axis = 0, keepdims=True)
-    newFeatures = newFeatures- minMat
+    # minMat = np.min(newFeatures, axis = 0, keepdims=True)
+    # newFeatures = newFeatures- minMat
     return newFeatures
 
 def auxilary(v):

@@ -37,15 +37,15 @@ class GAT(nn.Module):
         return h
 
 
-def train(g, features, labels, masks, model):
+def train(g, features, labels, masks, model, info):
     # define train/val samples, loss function and optimizer
     train_mask = masks[0]
     loss_fcn = nn.CrossEntropyLoss()
     # loss_fcn = FocalLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
-
+    optimizer = torch.optim.Adam(model.parameters(), lr=info['lr'], weight_decay=info['weight_decay'])
+    highestAcc = 0
     # training loop
-    for epoch in range(50):
+    for epoch in range(info['numEpoch']):
         model.train()
         logits = model(g, features)
         loss = loss_fcn(logits[train_mask], labels[train_mask])
@@ -59,6 +59,8 @@ def train(g, features, labels, masks, model):
                 epoch, loss.item(), acc, acctest
             )
         )
+        highestAcc = max(highestAcc, acctest)
+    return highestAcc
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -66,7 +68,8 @@ if __name__ == "__main__":
     parser.add_argument('--seed', help='type of seed: random vs fix', default='random')
     parser.add_argument('--lr', help='learning rate', default=0.003, type=float)
     parser.add_argument('--weight_decay', help='weight decay', default=0.00001, type=float)
-    parser.add_argument('--missingPercentage', help='percentage of missing utterance in MM data', default=10, type=int)
+    parser.add_argument('--edgeType', help='type of edge:0 for similarity and 1 for other', default=0, type=int)
+    parser.add_argument('--missing', help='percentage of missing utterance in MM data', default=10, type=int)
     parser.add_argument('--reconstruct', action='store_true', default=False, help='edge direction type')
     parser.add_argument('--numTest', help='number of test', default=10, type=int)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in log.txt')
@@ -83,14 +86,14 @@ if __name__ == "__main__":
             'numEpoch': args.numEpoch,
             'lr': args.lr, 
             'weight_decay': args.weight_decay,
-            'missingPercentage': args.missingPercentage,
+            'missing': args.missing,
             'seed': 'random',
             'numTest': args.numTest
         }
 
     for test in range(args.numTest):
         if args.seed == 'random':
-            setSeed = random.randint(1, 100000001)
+            setSeed = random.randint(1, 100001)
             info['seed'] = setSeed
         else:
             setSeed = int(args.seed)
@@ -99,11 +102,10 @@ if __name__ == "__main__":
             sourceFile = open('./log.txt', 'a')
             print('*'*10, 'INFO' ,'*'*10, file = sourceFile)
             print(info, file = sourceFile)
-            print('*'*10, 'End' ,'*'*10, file = sourceFile)
             sourceFile.close()
         graphPath = './graphIEMOCAP.dgl'
-        if args.missingPercentage > 0:
-            graphPath = f'./graphIEMOCAP_missing_{args.missingPercentage}_test{test}.dgl'
+        if args.missing > 0:
+            graphPath = f'./graphIEMOCAP_missing_{args.missing}_test{test}.dgl'
 
         print("generating MM graph")
         if os.path.isfile(graphPath):
@@ -111,27 +113,34 @@ if __name__ == "__main__":
         else:
             if args.dataset == 'MELD':
                 print("loading IEMOCAP")
-            data = IEMOCAP(args.missingPercentage)
+            data = IEMOCAP(args.missing, args.edgeType)
             g = data[0]
             dgl.save_graphs(graphPath, g)
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # # device = torch.device('cpu')
-    # g = g.to(device)
-    # features = g.ndata["feat"]
-    # labels = g.ndata["label"]
-    # masks = g.ndata["train_mask"], g.ndata["test_mask"]
+        print("loaded MM graph")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # device = torch.device('cpu')
+        g = g.to(device)
+        features = g.ndata["feat"]
+        labels = g.ndata["label"]
+        masks = g.ndata["train_mask"], g.ndata["test_mask"]
 
-    # # create GCN model
-    # in_size = features.shape[1]
-    # out_size = 6
-    # model = GAT(in_size, 128, out_size).to(device)
-    # print(model)
-    # # model training
-    # print("Training...")
-    # train(g, features, labels, masks, model)
+        # create GCN model
+        in_size = features.shape[1]
+        out_size = 6
+        model = GAT(in_size, 128, out_size).to(device)
+        print(model)
+        # model training
+        print("Training...")
+        highestAcc = train(g, features, labels, masks, model, info)
 
-    # # test the model
-    # print("Testing...")
-    # print(features.shape)
-    # acc = evaluate(g, features, labels, masks[1], model)
-    # print("Test accuracy {:.4f}".format(acc))
+        # test the model
+        print("Testing...")
+        print(features.shape)
+        acc = evaluate(g, features, labels, masks[1], model)
+        print("Final Test accuracy {:.4f}".format(acc))
+
+        if args.log:
+            sourceFile = open('./log.txt', 'a')
+            print(f'Highest Acc: {highestAcc}, final Acc {acc}', file = sourceFile)
+            print('*'*10, 'End' ,'*'*10, file = sourceFile)
+            sourceFile.close()
