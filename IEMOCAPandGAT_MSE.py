@@ -81,7 +81,11 @@ def auxilary(v):
     for ii in range(len(vv)):
         tmp = torch.unsqueeze(vv[ii], dim = 0)
         listR += tmp.T @ tmp
+    # a = listR / len(vv)
+    # b = a.numpy()
+    # b = np.sqrt(np.abs(b))
     mean = listR / len(vv)
+    # mean = torch.from_numpy(b)
     invMean = torch.linalg.inv(mean)
     vnew = v @ invMean.cuda()
     return vnew
@@ -150,7 +154,7 @@ def train(g, features, labels, masks, model):
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
 
     # training loop
-    for epoch in range(100):
+    for epoch in range(200):
         model.train()
         logits = model(g, features)
         loss = loss_fcn(logits[train_mask], labels[train_mask])
