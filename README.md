@@ -5,7 +5,7 @@ Create directory/ folder for dataset
 /res/
 /Users/"your current user"/
 ```
-install required packages in **requirement.txt**
+install required packages in **requirements.txt**
 ## Run example
 ```bash
 python IEMOCAPandGAT.py

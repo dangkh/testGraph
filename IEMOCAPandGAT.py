@@ -10,7 +10,6 @@ from dgl.data import CiteseerGraphDataset, CoraGraphDataset, PubmedGraphDataset
 from loadIEMOCAP import *
 torch.set_default_dtype(torch.double)
 
-# seed_everything(seed=10001)
 
 class GAT(nn.Module):
     def __init__(self, in_size, hid_size, out_size):
@@ -63,7 +62,6 @@ def train(g, features, labels, masks, model):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--2direction', action='store_true', default=False, help='edge direction type')
     parser.add_argument('--numEpoch', help='number of epochs', default=50, type=int)
     parser.add_argument('--seed', help='type of seed: random vs fix', default='random')
     parser.add_argument('--lr', help='learning rate', default=0.003, type=float)
@@ -71,40 +69,69 @@ if __name__ == "__main__":
     parser.add_argument('--missingPercentage', help='percentage of missing utterance in MM data', default=10, type=int)
     parser.add_argument('--reconstruct', action='store_true', default=False, help='edge direction type')
     parser.add_argument('--numTest', help='number of test', default=10, type=int)
+    parser.add_argument('--log', action='store_true', default=True, help='save experiment info in log.txt')
+    parser.add_argument('--output', help='savedFile', default='./result.txt')
+    parser.add_argument( "--dataset",
+        type=str,
+        default="IEMOCAP",
+        help="Dataset name ('IEMOCAP', 'MELD').",
+    )
     args = parser.parse_args()
     print(f"Training with DGL built-in GraphConv module.")
 
     info = {
             'numEpoch': args.numEpoch,
             'lr': args.lr, 
-            'weight_decay': args.weight_decay
+            'weight_decay': args.weight_decay,
+            'missingPercentage': args.missingPercentage,
+            'seed': 'random',
+            'numTest': args.numTest
         }
-    
-    # g = dgl.add_self_loop(g)
-    if os.path.isfile('./graphIEMOCAP.dgl'):
-        (g,), _ = dgl.load_graphs('graphIEMOCAP.dgl')
-    else:
-        data = IEMOCAP()
-        g = data[0]
-        dgl.save_graphs('graphIEMOCAP.dgl', g)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # device = torch.device('cpu')
-    g = g.to(device)
-    features = g.ndata["feat"]
-    labels = g.ndata["label"]
-    masks = g.ndata["train_mask"], g.ndata["test_mask"]
 
-    # create GCN model
-    in_size = features.shape[1]
-    out_size = 6
-    model = GAT(in_size, 128, out_size).to(device)
-    print(model)
-    # model training
-    print("Training...")
-    train(g, features, labels, masks, model)
+    for test in range(args.numTest):
+        if args.seed == 'random':
+            setSeed = random.randint(1, 100000001)
+            info['seed'] = setSeed
+        else:
+            setSeed = int(args.seed)
+        seed_everything(seed=setSeed)
+        if args.log:
+            sourceFile = open('./log.txt', 'a')
+            print('*'*10, 'INFO' ,'*'*10, file = sourceFile)
+            print(info, file = sourceFile)
+            print('*'*10, 'End' ,'*'*10, file = sourceFile)
+            sourceFile.close()
+        graphPath = './graphIEMOCAP.dgl'
+        if args.missingPercentage > 0:
+            graphPath = f'./graphIEMOCAP_missing_{args.missingPercentage}_test{test}.dgl'
 
-    # test the model
-    print("Testing...")
-    print(features.shape)
-    acc = evaluate(g, features, labels, masks[1], model)
-    print("Test accuracy {:.4f}".format(acc))
+        print("generating MM graph")
+        if os.path.isfile(graphPath):
+            (g,), _ = dgl.load_graphs(graphPath)
+        else:
+            if args.dataset == 'MELD':
+                print("loading IEMOCAP")
+            data = IEMOCAP(args.missingPercentage)
+            g = data[0]
+            dgl.save_graphs(graphPath, g)
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # # device = torch.device('cpu')
+    # g = g.to(device)
+    # features = g.ndata["feat"]
+    # labels = g.ndata["label"]
+    # masks = g.ndata["train_mask"], g.ndata["test_mask"]
+
+    # # create GCN model
+    # in_size = features.shape[1]
+    # out_size = 6
+    # model = GAT(in_size, 128, out_size).to(device)
+    # print(model)
+    # # model training
+    # print("Training...")
+    # train(g, features, labels, masks, model)
+
+    # # test the model
+    # print("Testing...")
+    # print(features.shape)
+    # acc = evaluate(g, features, labels, masks[1], model)
+    # print("Test accuracy {:.4f}".format(acc))

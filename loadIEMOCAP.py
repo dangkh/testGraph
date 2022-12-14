@@ -10,10 +10,9 @@ import pickle
 
 def genMissMultiModal(matSize, index):
     types = np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
-    typeExtend = [7, 3, 1]
-    percentIndex = [10, 20, 30]
+    typeExtend = [7, 3, 1, 0, 0, 0]
+    percentIndex = [10, 20, 30, 40, 50, 60]
     missPercent = 0
-    # batch_size = matSize[-1]
     batch_size = 1
     if matSize[0] != len(types[0]):
         return None
@@ -34,16 +33,18 @@ def genMissMultiModal(matSize, index):
                 tmp = random.randint(0, len(missType)-1)
                 mat[:,ii] = missType[tmp]
             missPercent = mat.sum() / (matSize[0] * matSize[-1]) * 100
-            print(missPercent)
             if np.abs(missPercent - percentIndex[index]) < 1.0:
                 listmask.append(mat)
+                print(missPercent)
                 missPercent = 0
                 break
     return listmask
 
 class IEMOCAP(DGLDataset):
-    def __init__(self):
+    def __init__(self, missing = 0):
         super().__init__(name='IEMOCAP_DGL')
+        self.missingPercentage = missing
+        self.genMissing(missing)
         self.process()
 
 
@@ -144,10 +145,11 @@ class IEMOCAP(DGLDataset):
 
 
     def genMissing(self, typeMissing = 10):
-        mm = genMissMultiModal((3, 1, 10), 2)
+        mm = genMissMultiModal((3, 10), 0)
         mm = np.asarray(mm[0])
         print(f'missing percent: {mm.sum()*1.0 / (mm.shape[0] * mm.shape[1])}')
         missingGraph = None
+        stop
         return missingGraph
 
 
@@ -158,3 +160,6 @@ class IEMOCAP(DGLDataset):
 # print(trainset[1][0].shape)
 
 # trainsetDGL = IEMOCAP()
+for ii in range(10, 40, 10):
+    index = (ii-10) // 10
+    genMissMultiModal((3, 10), index)
