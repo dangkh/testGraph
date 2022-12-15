@@ -6,9 +6,10 @@ import torch.nn.functional as F
 import dgl
 import dgl.nn as dglnn
 from dgl import AddSelfLoop
+from dgl.nn import LabelPropagation
 from dgl.data import CiteseerGraphDataset, CoraGraphDataset, PubmedGraphDataset
 from loadIEMOCAP import *
-torch.set_default_dtype(torch.double)
+torch.set_default_dtype(torch.float)
 
 
 class GAT(nn.Module):
@@ -28,6 +29,33 @@ class GAT(nn.Module):
 
     def forward(self, g, features):
         h = features
+        for i, layer in enumerate(self.layers):
+            if i != 0:
+                h = self.dropout(h)
+            h = layer(g, h)
+        h = torch.reshape(h, (len(h), -1))
+        h = self.linear(h)
+        return h
+
+class GAT_FP(nn.Module):
+    def __init__(self, in_size, hid_size, out_size):
+        super().__init__()
+        gcv = [in_size, 512, 32]
+        self.num_heads = 4
+        self.layers = nn.ModuleList()
+        # two-layer GCN
+        for ii in range(len(gcv)-1):
+            self.layers.append(
+                dglnn.GATConv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+            )
+        # self.layers.append(dglnn.GraphConv(hid_size, 16))
+        self.linear = nn.Linear(gcv[-1] * np.power(self.num_heads, len(gcv)-1), out_size)
+        self.dropout = nn.Dropout(0.5)
+        self.label_propagation = LabelPropagation(k=5, alpha=0.5, clamp=False, normalize=True)
+
+    def forward(self, g, features):
+        h = features
+        h = self.label_propagation(g, features)
         for i, layer in enumerate(self.layers):
             if i != 0:
                 h = self.dropout(h)
@@ -88,7 +116,8 @@ if __name__ == "__main__":
             'weight_decay': args.weight_decay,
             'missing': args.missing,
             'seed': 'random',
-            'numTest': args.numTest
+            'numTest': args.numTest,
+            'reconstruct': args.reconstruct
         }
 
     for test in range(args.numTest):
@@ -127,7 +156,10 @@ if __name__ == "__main__":
         # create GCN model
         in_size = features.shape[1]
         out_size = 6
-        model = GAT(in_size, 128, out_size).to(device)
+        if args.reconstruct:
+            model = GAT_FP(in_size, 128, out_size).to(device)    
+        else:
+            model = GAT(in_size, 128, out_size).to(device)
         print(model)
         # model training
         print("Training...")

@@ -29,7 +29,7 @@ def genMissMultiModal(matSize, percent):
         return None
     al, be, ga = missingParam(percent)
     listMask = []
-    masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]])]
+    masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]] * 2)]
     for mask, num in ([0, al], [1, be], [2, ga]):
         if num > 0:
             listMask.append(np.repeat(masks[mask], num, axis = 0))
