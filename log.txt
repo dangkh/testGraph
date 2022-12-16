@@ -377,3 +377,285 @@ Highest Acc: 58.841651263093034, final Acc 58.41035120147874
 ********** End **********
 ********** INFO **********
 {'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 40, 'seed': 62006, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.93653727664818, final Acc 54.959950708564385
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 96898, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 55.94577942082563, final Acc 52.37215033887862
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 98414, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.7516943930992, final Acc 55.76093653727665
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 53996, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 58.41035120147874, final Acc 49.106592729513245
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 14940, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 57.486136783733826, final Acc 52.37215033887862
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 20664, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 57.17806531115219, final Acc 52.68022181146026
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 63350, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 58.348736906962415, final Acc 52.18730745532964
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 6718, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 57.73259396179914, final Acc 54.405422057917434
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 13194, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 59.33456561922366, final Acc 54.03573629081947
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 27569, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.92236598890943, final Acc 57.05483672211953
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 50, 'seed': 80349, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 57.73259396179914, final Acc 52.5569932224276
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 97730, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 57.855822550831796, final Acc 49.106592729513245
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 40387, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 57.05483672211953, final Acc 49.90757855822551
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 24459, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 59.272951324707336, final Acc 55.26802218114602
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 34552, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 56.62353666050524, final Acc 51.078250154035736
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 26629, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 57.855822550831796, final Acc 53.29636475662354
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 1211, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 55.822550831792974, final Acc 48.613678373382626
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 39433, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 58.1022797288971, final Acc 50.58533579790512
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 45435, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 58.718422674060385, final Acc 46.76524953789279
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 83721, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 58.41035120147874, final Acc 52.5569932224276
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 60, 'seed': 87399, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 56.00739371534196, final Acc 47.62784966112138
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 46238, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.69008009858287, final Acc 57.794208256315464
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 46323, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.182994454713494, final Acc 57.23967960566851
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 79690, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.19716574245225, final Acc 56.438693776956256
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 88452, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 59.396179913739985, final Acc 57.36290819470117
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 5087, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.07393715341959, final Acc 56.377079482439925
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 88424, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.93653727664818, final Acc 60.19716574245225
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 88085, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.19716574245225, final Acc 57.794208256315464
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 23480, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.07393715341959, final Acc 57.486136783733826
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 70079, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 59.08810844115835, final Acc 57.855822550831796
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 30, 'seed': 58256, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.99815157116451, final Acc 59.02649414664202
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 29778, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.42945163277881, final Acc 59.396179913739985
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 43789, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.98398028342576, final Acc 56.86999383857055
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 88172, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.56685150955022, final Acc 58.47196549599507
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 82836, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 62.10720887245841, final Acc 59.6426370918053
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 63783, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.44362292051756, final Acc 59.45779420825632
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 32491, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 62.35366605052372, final Acc 57.91743684534812
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 21130, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.55268022181146, final Acc 59.272951324707336
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 42234, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.367837338262476, final Acc 59.82747997535428
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86704, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 60.813308687615525, final Acc 60.01232285890327
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 46367, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.49106592729513, final Acc 59.396179913739985
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 52647, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.03142329020333, final Acc 60.87492298213186
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 24006, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 62.292051756007396, final Acc 59.45779420825632
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 85296, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 62.230437461491064, final Acc 59.950708564386936
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 55096, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 62.47689463955638, final Acc 61.367837338262476
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 32365, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.737523105360445, final Acc 60.44362292051756
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 51961, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 61.05976586568084, final Acc 59.51940850277264
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 57539, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 62.35366605052372, final Acc 58.47196549599507
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 34779, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 62.292051756007396, final Acc 60.44362292051756
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 2709, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 62.10720887245841, final Acc 58.59519408502773
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 92890, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.339494762784966, final Acc 60.62846580406654
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 7296, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.09303758471965, final Acc 60.62846580406654
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 17123, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.52433764633395, final Acc 60.87492298213186
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86685, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.339494762784966, final Acc 61.12138016019716
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 52609, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.95563770794824, final Acc 61.182994454713494
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 64493, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.709180529882936, final Acc 60.69008009858287
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 63701, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.709180529882936, final Acc 60.813308687615525
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 99309, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.339494762784966, final Acc 61.182994454713494
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 60217, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.09303758471965, final Acc 60.38200862600123
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 94698, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.21626617375231, final Acc 61.12138016019716
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 5239, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 63.77079482439926, final Acc 60.69008009858287
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 29987, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 54.775107825015404, final Acc 49.661121380160196
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 69640, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 56.99322242760321, final Acc 48.613678373382626
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 68345, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 57.794208256315464, final Acc 51.940850277264325
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 74061, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 58.903265557609366, final Acc 50.09242144177449
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 40226, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 56.746765249537894, final Acc 51.69439309919901
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 89628, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 58.903265557609366, final Acc 48.30560690080099
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 76186, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 56.561922365988906, final Acc 53.17313616759088
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 38649, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 58.04066543438078, final Acc 50.15403573629082
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 23174, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 56.68515095502156, final Acc 49.969192852741834
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 87985, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 56.931608133086876, final Acc 52.92667898952557
+********** End **********

@@ -9,8 +9,10 @@ from dgl import AddSelfLoop
 from dgl.nn import LabelPropagation
 from dgl.data import CiteseerGraphDataset, CoraGraphDataset, PubmedGraphDataset
 from loadIEMOCAP import *
+from sklearn.metrics import f1_score
 torch.set_default_dtype(torch.float)
-
+# import warnings
+# warnings.filterwarnings("ignore", category=UserWarning)
 
 class GAT(nn.Module):
     def __init__(self, in_size, hid_size, out_size):
@@ -67,7 +69,7 @@ class GAT_FP(nn.Module):
 
 def train(g, features, labels, masks, model, info):
     # define train/val samples, loss function and optimizer
-    train_mask = masks[0]
+    train_mask = masks[0].bool()
     loss_fcn = nn.CrossEntropyLoss()
     # loss_fcn = FocalLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=info['lr'], weight_decay=info['weight_decay'])
@@ -100,8 +102,9 @@ if __name__ == "__main__":
     parser.add_argument('--missing', help='percentage of missing utterance in MM data', default=10, type=int)
     parser.add_argument('--reconstruct', action='store_true', default=False, help='edge direction type')
     parser.add_argument('--numTest', help='number of test', default=10, type=int)
-    parser.add_argument('--log', action='store_true', default=True, help='save experiment info in log.txt')
-    parser.add_argument('--output', help='savedFile', default='./result.txt')
+    parser.add_argument('--mergeLabel', help='mergeLabel from 6 to 4',action='store_true', default=False)
+    parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
+    parser.add_argument('--output', help='savedFile', default='./log.txt')
     parser.add_argument( "--dataset",
         type=str,
         default="IEMOCAP",
@@ -128,21 +131,19 @@ if __name__ == "__main__":
             setSeed = int(args.seed)
         seed_everything(seed=setSeed)
         if args.log:
-            sourceFile = open('./log.txt', 'a')
+            sourceFile = open(args.output, 'a')
             print('*'*10, 'INFO' ,'*'*10, file = sourceFile)
             print(info, file = sourceFile)
             sourceFile.close()
-        graphPath = './graphIEMOCAP.dgl'
+        graphPath = f'./graph{args.dataset}.dgl'
         if args.missing > 0:
-            graphPath = f'./graphIEMOCAP_missing_{args.missing}_test{test}.dgl'
+            graphPath = f'./graph{args.dataset}_missing_{args.missing}_test{test}.dgl'
 
         print("generating MM graph")
         if os.path.isfile(graphPath):
             (g,), _ = dgl.load_graphs(graphPath)
-        else:
-            if args.dataset == 'MELD':
-                print("loading IEMOCAP")
-            data = IEMOCAP(args.missing, args.edgeType)
+        else:        
+            data = IEMOCAP(args.dataset, f'./{args.dataset}_features/{args.dataset}_features.pkl',args.mergeLabel,args.missing, args.edgeType)
             g = data[0]
             dgl.save_graphs(graphPath, g)
         print("loaded MM graph")
@@ -155,7 +156,7 @@ if __name__ == "__main__":
 
         # create GCN model
         in_size = features.shape[1]
-        out_size = 6
+        out_size = torch.unique(g.ndata['label']).shape[0]
         if args.reconstruct:
             model = GAT_FP(in_size, 128, out_size).to(device)    
         else:
@@ -172,7 +173,7 @@ if __name__ == "__main__":
         print("Final Test accuracy {:.4f}".format(acc))
 
         if args.log:
-            sourceFile = open('./log.txt', 'a')
+            sourceFile = open(args.output, 'a')
             print(f'Highest Acc: {highestAcc}, final Acc {acc}', file = sourceFile)
             print('*'*10, 'End' ,'*'*10, file = sourceFile)
             sourceFile.close()

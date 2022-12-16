@@ -3,6 +3,7 @@ import torch
 import numpy as np 
 from torch import nn
 import torch.nn.functional as F
+from sklearn.metrics import f1_score
 seed = 1001
 
 def seed_everything(seed=seed):
@@ -65,6 +66,7 @@ class FocalLoss(nn.Module):
 def norm(features):
     meanMat = np.mean(features, axis=0, keepdims=True)
     stdMat = np.std(features, axis=0, keepdims=True)
+    stdMat[np.where(stdMat == 0)] = 1
     newFeatures = (features - meanMat) / stdMat
     # minMat = np.min(newFeatures, axis = 0, keepdims=True)
     # newFeatures = newFeatures- minMat
@@ -122,9 +124,13 @@ def evaluate(g, features, labels, mask, model):
     model.eval()
     with torch.no_grad():
         logits = model(g, features)
+        mask = mask.bool()
         # logits = auxilary(logits)
         logits = logits[mask]
         labels = labels[mask]
         _, indices = torch.max(logits, dim=1)
-        correct = torch.sum(indices == labels)
-        return correct.item() * 100.0 / len(labels)
+        print(labels)
+        print(indices)
+        # correct = torch.sum(indices == labels)
+        # return correct.item() * 100.0 / len(labels)
+        return f1_score(indices.cpu(), labels.cpu(), average='weighted')

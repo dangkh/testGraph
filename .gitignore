@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 *.dgl
 *log.txt
+*.pkl
+4labels.txt
+log.txt

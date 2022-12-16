@@ -11,8 +11,8 @@ import pickle
 
 def missingParam(percent):
     al, be , ga = 0, 0, 0
-    for aa in range(20):
-        for bb in range(20):
+    for aa in range(1, 20):
+        for bb in range(1, 20):
             for gg in range(20):
                 if (aa+bb+gg) != 0:
                     if abs(((bb*3 + gg * 6) * 100.0 / (aa*3 + bb*9 + gg*6)) - percent) <= 1.0:
@@ -29,7 +29,7 @@ def genMissMultiModal(matSize, percent):
         return None
     al, be, ga = missingParam(percent)
     listMask = []
-    masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]] * 2)]
+    masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]])]
     for mask, num in ([0, al], [1, be], [2, ga]):
         if num > 0:
             listMask.append(np.repeat(masks[mask], num, axis = 0))
@@ -46,10 +46,13 @@ def genMissMultiModal(matSize, percent):
     return np.zeros((matSize[0], matSize[-1]))
 
 class IEMOCAP(DGLDataset):
-    def __init__(self, missing = 0, edgeType = 0):
+    def __init__(self, nameDataset='IEMOCAP', path = './IEMOCAP_features/IEMOCAP_features.pkl',mergeLabel = False, missing = 0, edgeType = 0):
         self.missing = missing
         self.edgeType = edgeType
-        super().__init__(name='IEMOCAP_DGL')
+        self.path = path
+        self.dataset = nameDataset
+        self.mergeLabel = mergeLabel
+        super().__init__(name='dataset_DGL')
 
 
     def extractNode(self, x1, x2, x3, x4):
@@ -104,9 +107,16 @@ class IEMOCAP(DGLDataset):
         return x1, x2, x3
 
     def process(self):
-        self.videoIDs, self.videoSpeakers, self.videoLabels, self.videoText,\
-        self.videoAudio, self.videoVisual, self.videoSentence, self.trainVid,\
-        self.testVid = pickle.load(open('./IEMOCAP_features/IEMOCAP_features.pkl', 'rb'), encoding='latin1')
+        inputData = pickle.load(open(self.path, 'rb'), encoding='latin1')
+        if self.dataset == 'MELD':
+            self.videoIDs, self.videoSpeakers, self.videoLabels, self.videoText,\
+            self.videoAudio, self.videoVisual, self.videoSentence, self.trainVid,\
+            self.testVid, _ = inputData
+        else:
+            self.videoIDs, self.videoSpeakers, self.videoLabels, self.videoText,\
+            self.videoAudio, self.videoVisual, self.videoSentence, self.trainVid,\
+            self.testVid = inputData
+        
         numSubGraph = len(self.trainVid) + len(self.testVid)
         numNodeTrain = sum([len(self.videoText[x]) for x in self.trainVid])
         numNodeTest = sum([len(self.videoText[x]) for x in self.testVid])
@@ -118,12 +128,14 @@ class IEMOCAP(DGLDataset):
         node_features = np.vstack([node_featuresTrain, node_featuresTest])
         # feature normalization
         node_features = norm(node_features)
-        
+
         node_labelTrain = np.hstack([np.asarray(self.videoLabels[x]) for x in self.trainVid])
         node_labelTest = np.hstack([np.asarray(self.videoLabels[x]) for x in self.testVid])
         node_labels = np.hstack([node_labelTrain, node_labelTest])
+        if self.mergeLabel:
+            node_labels[np.where(node_labels == 4)] = 0
+            node_labels[np.where(node_labels == 5)] = 1
         self.num_classes = np.unique(node_labels)
-
         node_features =  torch.from_numpy(node_features).double()
         node_labels =  torch.from_numpy(node_labels).long()
         edge_features = []
