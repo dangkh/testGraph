@@ -10,9 +10,9 @@ from dgl.nn import LabelPropagation
 from dgl.data import CiteseerGraphDataset, CoraGraphDataset, PubmedGraphDataset
 from loadData import *
 from sklearn.metrics import f1_score
-torch.set_default_dtype(torch.float)
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning)
+# torch.set_default_dtype(torch.float)
+# import warnings
+# warnings.filterwarnings("ignore", category=UserWarning)
 
 class GAT(nn.Module):
     def __init__(self, in_size, hid_size, out_size):
@@ -23,7 +23,7 @@ class GAT(nn.Module):
         # two-layer GCN
         for ii in range(len(gcv)-1):
             self.layers.append(
-                dglnn.GATv2Conv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+                dglnn.GATConv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
         self.linear = nn.Linear(gcv[-1] * np.power(self.num_heads, len(gcv)-1), out_size)
@@ -35,6 +35,32 @@ class GAT(nn.Module):
             if i != 0:
                 h = self.dropout(h)
             h = h.float()
+            h = layer(g, h)
+        h = torch.reshape(h, (len(h), -1))
+        h = self.linear(h)
+        return h
+
+class GAT_v2(nn.Module):
+    def __init__(self, in_size, hid_size, out_size):
+        super().__init__()
+        gcv = [in_size, 512, 32]
+        self.num_heads = 4
+        self.layers = nn.ModuleList()
+        # two-layer GCN
+        for ii in range(len(gcv)-1):
+            self.layers.append(
+                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+            )
+        self.linear = nn.Linear(gcv[-1] * self.num_heads, out_size)
+        self.dropout = nn.Dropout(0.5)
+
+    def forward(self, g, features):
+        h = features
+        for i, layer in enumerate(self.layers):
+            if i != 0:
+                h = self.dropout(h)
+            h = h.float()
+            h = torch.reshape(h, (len(h), -1))
             h = layer(g, h)
         h = torch.reshape(h, (len(h), -1))
         h = self.linear(h)
@@ -62,6 +88,7 @@ class GAT_FP(nn.Module):
         for i, layer in enumerate(self.layers):
             if i != 0:
                 h = self.dropout(h)
+
             h = layer(g, h)
         h = torch.reshape(h, (len(h), -1))
         h = self.linear(h)
@@ -161,6 +188,7 @@ if __name__ == "__main__":
             data = IEMOCAP(args.dataset, f'./{args.dataset}_features/{args.dataset}_features.pkl',args.mergeLabel,args.missing, args.edgeType)
             g = data[0]
             dgl.save_graphs(graphPath, g)
+        # g = dgl.add_self_loop(g) 
         print("loaded MM graph")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # device = torch.device('cpu')
@@ -177,7 +205,7 @@ if __name__ == "__main__":
         if args.wFP:
             model = GAT_FP(in_size, 128, out_size, args.numFP).to(device)    
         else:
-            model = GAT(in_size, 128, out_size).to(device)
+            model = GAT_v2(in_size, 128, out_size).to(device)
         print(model)
         # model training
         print("Training...")

@@ -29,10 +29,10 @@ def genMissMultiModal(matSize, percent):
         return None
     al, be, ga = missingParam(percent)
     errPecent = 1.7
-    if matSize[-1] <= 5:
-        errPecent = 5
-    if matSize[-1] <= 2:
-        errPecent = 20
+    # if matSize[-1] <= 5:
+    #     errPecent = 5
+    # if matSize[-1] <= 2:
+    #     errPecent = 20
     listMask = []
     masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]])]
     for mask, num in ([0, al], [1, be], [2, ga]):
@@ -179,9 +179,6 @@ class IEMOCAP(DGLDataset):
 
     def __len__(self):
         return 1
-
-    def reconstruct(self, typeReconstruct):
-        pass
 
 # trainset = IEMOCAPDataset()
 # print(trainset[1][0].shape)
