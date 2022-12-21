@@ -1,0 +1,71 @@
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 69874, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6296250037268214, final Acc 0.5818118968435009
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 42473, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6268554618191082, final Acc 0.578206043015873
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 13582, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6227312844772454, final Acc 0.5965828685610647
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 48182, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6295916035376511, final Acc 0.6085387486503925
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 48176, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6336069395550114, final Acc 0.5901222548746468
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 36258, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6346404459646782, final Acc 0.6064361463268758
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 88157, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6330599525444887, final Acc 0.57841637670666
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 59071, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6219438729778579, final Acc 0.5797256940763112
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 99310, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6210398013300426, final Acc 0.575620186764478
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 97313, 'numTest': 10, 'reconstruct': True}
+Highest Acc: 0.6379627391915749, final Acc 0.5942740407770535
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 54221, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.6172441411250608, final Acc 0.5735193369977338
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 47772, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.5913297093475457, final Acc 0.57647899613411
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 31467, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.6249940907739078, final Acc 0.5821441933544171
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 73601, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.6297581727654288, final Acc 0.5874471149907179
+********** End **********
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 83693, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 73029, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 74696, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 43827, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 53886, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 40326, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 77864, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+********** INFO **********
+{'numEpoch': 100, 'lr': 0.003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 43258, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}

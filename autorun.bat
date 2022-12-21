@@ -1,0 +1,1 @@
+python trainGAT.py --numEpoch 100 --seed random --lr 0.0003 --weight_decay 0.00001 --missing 10 --numTest 1 --dataset MELD --wFP --output logMELD.txt

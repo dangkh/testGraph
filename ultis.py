@@ -5,6 +5,11 @@ from torch import nn
 import torch.nn.functional as F
 from sklearn.metrics import f1_score
 seed = 1001
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.colors import ListedColormap
+
 
 def seed_everything(seed=seed):
     random.seed(seed)
@@ -74,11 +79,18 @@ def norm(features):
 
 def auxilary(v):
     vv = v.clone().detach().cpu()
-    listR = torch.zeros(6, 6)
-    for ii in range(len(vv)):
-        tmp = torch.unsqueeze(vv[ii], dim = 0)
-        listR += tmp.T @ tmp
-    mean = torch.sqrt(listR / len(vv))
+    meanMat = np.mean(np.asarray(vv), axis=0, keepdims=True)
+    stdMat = np.std(np.asarray(vv), axis=0, keepdims=True)
+    stdMat[np.where(stdMat == 0)] = 1
+    newFeatures = (np.asarray(vv) - meanMat) / stdMat
+    minMat = np.min(newFeatures, axis = 0, keepdims=True)
+    newFeatures = torch.from_numpy(newFeatures- minMat)
+    # newFeatures = torch.from_numpy(newFeatures)
+    # listR = torch.zeros(vv[0].shape[0], vv[0].shape[0])
+    # for ii in range(len(newFeatures)):
+    #     tmp = torch.unsqueeze(newFeatures[ii], dim = 0)
+    #     listR += tmp.T @ tmp
+    mean = torch.sqrt(torch.abs(newFeatures.T @ newFeatures) / len(newFeatures.T))
     invMean = torch.linalg.inv(mean)
     vnew = v @ invMean.cuda()
     return vnew
@@ -129,8 +141,32 @@ def evaluate(g, features, labels, mask, model):
         logits = logits[mask]
         labels = labels[mask]
         _, indices = torch.max(logits, dim=1)
-        print(labels)
-        print(indices)
         # correct = torch.sum(indices == labels)
         # return correct.item() * 100.0 / len(labels)
         return f1_score(indices.cpu(), labels.cpu(), average='weighted')
+
+def evaluateMSE(g, features, labels, mask, model, visual = False, originalLabel = None):
+    model.eval()
+    with torch.no_grad():
+        logits = model(g, features)
+        logits = logits[mask]
+        labels = labels[mask]
+        d = logits - labels
+        meanSquareD = torch.sqrt(torch.mean(d**2, dim=0)).sum().item()
+        # _, indices = torch.max(logits, dim=1)
+        # correct = torch.sum(indices == labels)
+        if visual:
+            logits = auxilary(logits)
+            originalLabel = originalLabel[mask]
+            vis2([logits.cpu(), originalLabel.cpu()])
+        return meanSquareD
+
+def convertX2Binary(labels):
+    listLabel = []
+    sizeLabel = len(np.unique(labels.cpu()))
+    for ll in labels:
+        newll = torch.zeros(sizeLabel)
+        newll[ll] = 1
+        listLabel.append(newll)
+    r = torch.stack(listLabel )
+    return r.cuda()

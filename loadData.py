@@ -11,9 +11,9 @@ import pickle
 
 def missingParam(percent):
     al, be , ga = 0, 0, 0
-    for aa in range(1, 20):
-        for bb in range(1, 20):
-            for gg in range(20):
+    for aa in range(1, 200):
+        for bb in range(1, 200):
+            for gg in range(200):
                 if (aa+bb+gg) != 0:
                     if abs(((bb*3 + gg * 6) * 100.0 / (aa*3 + bb*9 + gg*6)) - percent) <= 1.0:
                         return aa, bb, gg
@@ -28,6 +28,11 @@ def genMissMultiModal(matSize, percent):
     if matSize[0] != len(types[0]):
         return None
     al, be, ga = missingParam(percent)
+    errPecent = 1.7
+    if matSize[-1] <= 5:
+        errPecent = 5
+    if matSize[-1] <= 2:
+        errPecent = 20
     listMask = []
     masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]])]
     for mask, num in ([0, al], [1, be], [2, ga]):
@@ -41,7 +46,7 @@ def genMissMultiModal(matSize, percent):
             tmp = random.randint(0, len(missType)-1)
             mat[:,ii] = missType[tmp]
         missPercent = mat.sum() / (matSize[0] * matSize[-1]) * 100
-        if np.abs(missPercent - percent) < 1.7:
+        if (np.abs(missPercent - percent) < errPecent) & (np.abs(missPercent - percent) > 0):
             return mat
     return np.zeros((matSize[0], matSize[-1]))
 
@@ -128,13 +133,14 @@ class IEMOCAP(DGLDataset):
         node_features = np.vstack([node_featuresTrain, node_featuresTest])
         # feature normalization
         node_features = norm(node_features)
-
         node_labelTrain = np.hstack([np.asarray(self.videoLabels[x]) for x in self.trainVid])
         node_labelTest = np.hstack([np.asarray(self.videoLabels[x]) for x in self.testVid])
         node_labels = np.hstack([node_labelTrain, node_labelTest])
         if self.mergeLabel:
             node_labels[np.where(node_labels == 4)] = 0
             node_labels[np.where(node_labels == 5)] = 1
+            if self.dataset == 'MELD':
+                node_labels[np.where(node_labels == 6)] = 4
         self.num_classes = np.unique(node_labels)
         node_features =  torch.from_numpy(node_features).double()
         node_labels =  torch.from_numpy(node_labels).long()
@@ -150,7 +156,6 @@ class IEMOCAP(DGLDataset):
                 edges_src.append(x2)
                 edges_dst.append(x3)
                 counter += numUtterance
-
         edge_features, edges_src, edges_dst = convertNP2Tensor([ np.hstack(edge_features), np.hstack(edges_src), np.hstack(edges_dst)])
         self.graph = dgl.graph((edges_src, edges_dst), num_nodes=numberNode)
         self.graph.ndata['feat'] = node_features

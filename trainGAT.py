@@ -8,11 +8,11 @@ import dgl.nn as dglnn
 from dgl import AddSelfLoop
 from dgl.nn import LabelPropagation
 from dgl.data import CiteseerGraphDataset, CoraGraphDataset, PubmedGraphDataset
-from loadIEMOCAP import *
+from loadData import *
 from sklearn.metrics import f1_score
 torch.set_default_dtype(torch.float)
-# import warnings
-# warnings.filterwarnings("ignore", category=UserWarning)
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
 class GAT(nn.Module):
     def __init__(self, in_size, hid_size, out_size):
@@ -23,7 +23,7 @@ class GAT(nn.Module):
         # two-layer GCN
         for ii in range(len(gcv)-1):
             self.layers.append(
-                dglnn.GATConv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+                dglnn.GATv2Conv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
         self.linear = nn.Linear(gcv[-1] * np.power(self.num_heads, len(gcv)-1), out_size)
@@ -34,13 +34,14 @@ class GAT(nn.Module):
         for i, layer in enumerate(self.layers):
             if i != 0:
                 h = self.dropout(h)
+            h = h.float()
             h = layer(g, h)
         h = torch.reshape(h, (len(h), -1))
         h = self.linear(h)
         return h
 
 class GAT_FP(nn.Module):
-    def __init__(self, in_size, hid_size, out_size):
+    def __init__(self, in_size, hid_size, out_size, numFP):
         super().__init__()
         gcv = [in_size, 512, 32]
         self.num_heads = 4
@@ -48,12 +49,12 @@ class GAT_FP(nn.Module):
         # two-layer GCN
         for ii in range(len(gcv)-1):
             self.layers.append(
-                dglnn.GATConv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+                dglnn.GATv2Conv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
         self.linear = nn.Linear(gcv[-1] * np.power(self.num_heads, len(gcv)-1), out_size)
         self.dropout = nn.Dropout(0.5)
-        self.label_propagation = LabelPropagation(k=5, alpha=0.5, clamp=False, normalize=True)
+        self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
 
     def forward(self, g, features):
         h = features
@@ -70,26 +71,36 @@ class GAT_FP(nn.Module):
 def train(g, features, labels, masks, model, info):
     # define train/val samples, loss function and optimizer
     train_mask = masks[0].bool()
-    loss_fcn = nn.CrossEntropyLoss()
-    # loss_fcn = FocalLoss()
+    if info['MSE'] == False:
+        loss_fcn = nn.CrossEntropyLoss()
+        # loss_fcn = FocalLoss()
+    else:
+        loss_fcn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=info['lr'], weight_decay=info['weight_decay'])
     highestAcc = 0
     # training loop
     for epoch in range(info['numEpoch']):
         model.train()
         logits = model(g, features)
+        if info['MSE'] == True:
+            logits = auxilary(logits)
         loss = loss_fcn(logits[train_mask], labels[train_mask])
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        acc = evaluate(g, features, labels, train_mask, model)
-        acctest = evaluate(g, features, labels, masks[1], model)
+        if info['MSE'] == False:
+            acc = evaluate(g, features, labels, train_mask, model)
+            acctest = evaluate(g, features, labels, masks[1], model)
+        else:
+            acc = evaluateMSE(g, features, labels, train_mask, model)
+            acctest = evaluateMSE(g, features, labels, masks[1], model)
         print(
             "Epoch {:05d} | Loss {:.4f} | Accuracy_train {:.4f} | Accuracy_test {:.4f} ".format(
                 epoch, loss.item(), acc, acctest
             )
         )
         highestAcc = max(highestAcc, acctest)
+
     return highestAcc
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -100,11 +111,13 @@ if __name__ == "__main__":
     parser.add_argument('--weight_decay', help='weight decay', default=0.00001, type=float)
     parser.add_argument('--edgeType', help='type of edge:0 for similarity and 1 for other', default=0, type=int)
     parser.add_argument('--missing', help='percentage of missing utterance in MM data', default=10, type=int)
-    parser.add_argument('--reconstruct', action='store_true', default=False, help='edge direction type')
+    parser.add_argument('--wFP', action='store_true', default=False, help='edge direction type')
+    parser.add_argument('--numFP', help='number of FP layer', default=5, type=int)
     parser.add_argument('--numTest', help='number of test', default=10, type=int)
-    parser.add_argument('--mergeLabel', help='mergeLabel from 6 to 4',action='store_true', default=False)
+    parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
+    parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
         default="IEMOCAP",
@@ -120,7 +133,9 @@ if __name__ == "__main__":
             'missing': args.missing,
             'seed': 'random',
             'numTest': args.numTest,
-            'reconstruct': args.reconstruct
+            'wFP': args.wFP,
+            'numFP': args.numFP,
+            'MSE': args.MSE
         }
 
     for test in range(args.numTest):
@@ -152,13 +167,15 @@ if __name__ == "__main__":
         g = g.to(device)
         features = g.ndata["feat"]
         labels = g.ndata["label"]
+        if args.MSE:
+            labels = convertX2Binary(labels)
         masks = g.ndata["train_mask"], g.ndata["test_mask"]
 
         # create GCN model
         in_size = features.shape[1]
         out_size = torch.unique(g.ndata['label']).shape[0]
-        if args.reconstruct:
-            model = GAT_FP(in_size, 128, out_size).to(device)    
+        if args.wFP:
+            model = GAT_FP(in_size, 128, out_size, args.numFP).to(device)    
         else:
             model = GAT(in_size, 128, out_size).to(device)
         print(model)
@@ -169,7 +186,11 @@ if __name__ == "__main__":
         # test the model
         print("Testing...")
         print(features.shape)
-        acc = evaluate(g, features, labels, masks[1], model)
+        if args.MSE:
+            acc = evaluateMSE(g, features, labels, masks[1], model, visual=True, originalLabel=g.ndata["label"])
+        else:
+            labels = g.ndata["label"]
+            acc = evaluate(g, features, labels, masks[1], model)
         print("Final Test accuracy {:.4f}".format(acc))
 
         if args.log:
