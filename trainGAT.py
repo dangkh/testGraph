@@ -24,7 +24,7 @@ class GAT(nn.Module):
         # two-layer GCN
         for ii in range(len(gcv)-1):
             self.layers.append(
-                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+                dglnn.GATConv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
         self.linear = nn.Linear(gcv[-1] * self.num_heads, out_size)
         self.dropout = nn.Dropout(0.5)
@@ -50,7 +50,7 @@ class GAT_FP(nn.Module):
         # two-layer GCN
         for ii in range(len(gcv)-1):
             self.layers.append(
-                dglnn.GATv2Conv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+                dglnn.GATConv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
         self.linear = nn.Linear(gcv[-1] * np.power(self.num_heads, len(gcv)-1), out_size)
@@ -69,7 +69,7 @@ class GAT_FP(nn.Module):
         return h
 
 
-def train(g, features, labels, masks, model, info):
+def train(g, masks, model, info):
     # define train/val samples, loss function and optimizer
     train_mask = masks[0].bool()
     if info['MSE'] == False:
@@ -90,8 +90,8 @@ def train(g, features, labels, masks, model, info):
         loss.backward()
         optimizer.step()
         if info['MSE'] == False:
-            acc = evaluate(g, features, labels, train_mask, model)
-            acctest = evaluate(g, features, labels, masks[1], model)
+            acc = evaluate(g, train_mask, model)
+            acctest = evaluate(g, masks[1], model)
         else:
             acc = evaluateMSE(g, features, labels, train_mask, model)
             acctest = evaluateMSE(g, features, labels, masks[1], model)
@@ -151,9 +151,9 @@ if __name__ == "__main__":
             print('*'*10, 'INFO' ,'*'*10, file = sourceFile)
             print(info, file = sourceFile)
             sourceFile.close()
-        graphPath = f'./graph{args.dataset}.dgl'
+        graphPath = f'./graph{args.dataset}/{args.dataset}.dgl'
         if args.missing > 0:
-            graphPath = f'./graph{args.dataset}_missing_{args.missing}_test{test}.dgl'
+            graphPath = f'./graph{args.dataset}/missing_{args.missing}_test{test}.dgl'
 
         print("generating MM graph")
         if os.path.isfile(graphPath):
@@ -191,7 +191,7 @@ if __name__ == "__main__":
             acc = evaluateMSE(g, features, labels, masks[1], model, visual=True, originalLabel=g.ndata["label"])
         else:
             labels = g.ndata["label"]
-            acc = evaluate(g, features, labels, masks[1], model)
+            acc = evaluate(g, masks[1], model)
         print("Final Test accuracy {:.4f}".format(acc))
 
         if args.log:

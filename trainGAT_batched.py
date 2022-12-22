@@ -45,15 +45,15 @@ class GAT_FP(nn.Module):
     def __init__(self, in_size, hid_size, out_size, numFP):
         super().__init__()
         gcv = [in_size, 512, 32]
-        self.num_heads = 1
+        self.num_heads = 4
         self.layers = nn.ModuleList()
         # two-layer GCN
         for ii in range(len(gcv)-1):
             self.layers.append(
-                dglnn.GATv2Conv(gcv[ii], gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
-        self.linear = nn.Linear(gcv[-1] * np.power(self.num_heads, len(gcv)-1), out_size)
+        self.linear = nn.Linear(gcv[-1] * self.num_heads, out_size)
         self.dropout = nn.Dropout(0.5)
         self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
 
@@ -63,6 +63,8 @@ class GAT_FP(nn.Module):
         for i, layer in enumerate(self.layers):
             if i != 0:
                 h = self.dropout(h)
+            h = h.float()
+            h = torch.reshape(h, (len(h), -1))
             h = layer(g, h)
         h = torch.reshape(h, (len(h), -1))
         h = self.linear(h)
@@ -82,7 +84,6 @@ def train(g, trainSet, testSet, masks, model, info):
     listTrain = dgl.unbatch(trainSet)
     for epoch in range(info['numEpoch']):
         totalLoss = 0
-        counter = 0
         for graph in listTrain:
             features = graph.ndata["feat"]
             labels = graph.ndata["label"]
@@ -115,7 +116,7 @@ if __name__ == "__main__":
     parser.add_argument('--wFP', action='store_true', default=False, help='edge direction type')
     parser.add_argument('--numFP', help='number of FP layer', default=5, type=int)
     parser.add_argument('--numTest', help='number of test', default=10, type=int)
-    parser.add_argument('--batchSize', help='size of batch', default=16, type=int)
+    parser.add_argument('--batchSize', help='size of batch', default=8, type=int)
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
