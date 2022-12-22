@@ -69,10 +69,8 @@ class GAT_FP(nn.Module):
         return h
 
 
-def train(g, labels, masks, model, info):
+def train(g, trainSet, testSet, masks, model, info):
     # define train/val samples, loss function and optimizer
-    train_mask = masks[0].bool()
-    features = g.ndata["feat"]
     if info['MSE'] == False:
         loss_fcn = nn.CrossEntropyLoss()
         # loss_fcn = FocalLoss()
@@ -81,18 +79,24 @@ def train(g, labels, masks, model, info):
     optimizer = torch.optim.Adam(model.parameters(), lr=info['lr'], weight_decay=info['weight_decay'])
     highestAcc = 0
     # training loop
+    listTrain = dgl.unbatch(trainSet)
     for epoch in range(info['numEpoch']):
-        model.train()
-        logits = model(g, features)
-        loss = loss_fcn(logits[train_mask], labels[train_mask])
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        acc = evaluateMSE(g, features, labels, train_mask, model)
-        acctest = evaluateMSE(g, features, labels, masks[1], model)
+        totalLoss = 0
+        for graph in listTrain:
+            features = graph.ndata["feat"]
+            labels = graph.ndata["label"]
+            model.train()
+            logits = model(graph, features)
+            loss = loss_fcn(logits, labels)
+            totalLoss += loss.item()
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+        acc = evaluate(g, masks[0], model)
+        acctest = evaluate(g, masks[1], model)
         print(
             "Epoch {:05d} | Loss {:.4f} | Accuracy_train {:.4f} | Accuracy_test {:.4f} ".format(
-                epoch, loss.item(), acc, acctest
+                epoch, totalLoss, acc, acctest
             )
         )
         highestAcc = max(highestAcc, acctest)
@@ -110,6 +114,7 @@ if __name__ == "__main__":
     parser.add_argument('--wFP', action='store_true', default=False, help='edge direction type')
     parser.add_argument('--numFP', help='number of FP layer', default=5, type=int)
     parser.add_argument('--numTest', help='number of test', default=10, type=int)
+    parser.add_argument('--batchSize', help='size of batch', default=16, type=int)
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
@@ -146,17 +151,27 @@ if __name__ == "__main__":
             print('*'*10, 'INFO' ,'*'*10, file = sourceFile)
             print(info, file = sourceFile)
             sourceFile.close()
-        graphPath = f'./graph{args.dataset}.dgl'
+        graphPath = f'./graph{args.dataset}/{args.dataset}.dgl'
+        trainPath = f'./graph{args.dataset}/{args.dataset}_trainset.dgl'
+        testPath = f'./graph{args.dataset}/{args.dataset}_testset.dgl'
         if args.missing > 0:
-            graphPath = f'./graph{args.dataset}_missing_{args.missing}_test{test}.dgl'
+            graphPath = f'./graph{args.dataset}/missing_{args.missing}_test{test}.dgl'
 
         print("generating MM graph")
         if os.path.isfile(graphPath):
             (g,), _ = dgl.load_graphs(graphPath)
+            trainPath = f'./graph{args.dataset}/missing_{args.missing}_test{test}_trainset.dgl'
+            (trainSet,), _ = dgl.load_graphs(trainPath)
+            testPath = f'./graph{args.dataset}/missing_{args.missing}_test{test}_testset.dgl'
+            (testSet,), _ = dgl.load_graphs(testPath)
         else:        
-            data = IEMOCAP(args.dataset, f'./{args.dataset}_features/{args.dataset}_features.pkl',args.mergeLabel,args.missing, args.edgeType)
-            g = data[0]
+            data = IEMOCAP()
+            g, trainSet, testSet = data[0]
             dgl.save_graphs(graphPath, g)
+            trainPath = f'./graph{args.dataset}/missing_{args.missing}_test{test}_trainset.dgl'
+            dgl.save_graphs(trainPath, trainSet)
+            testPath = f'./graph{args.dataset}/missing_{args.missing}_test{test}_testset.dgl'
+            dgl.save_graphs(testPath, testSet)
         print("loaded MM graph")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # device = torch.device('cpu')
@@ -177,16 +192,16 @@ if __name__ == "__main__":
         print(model)
         # model training
         print("Training...")
-        highestAcc = train(g, labels, masks, model, info)
+        highestAcc = train(g, trainSet, testSet, masks, model, info)
 
         # test the model
         print("Testing...")
         print(features.shape)
         if args.MSE:
-            acc = evaluateMSE(g, features, labels, masks[1], model, visual=True, originalLabel=g.ndata["label"])
+            acc = evaluateMSE(g, testSet, labels, masks[1], model, visual=True, originalLabel=g.ndata["label"])
         else:
             labels = g.ndata["label"]
-            acc = evaluate(g, features, labels, masks[1], model)
+            acc = evaluate(g, masks[1], model)
         print("Final Test accuracy {:.4f}".format(acc))
 
         if args.log:

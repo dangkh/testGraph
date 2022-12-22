@@ -51,12 +51,14 @@ def genMissMultiModal(matSize, percent):
     return np.zeros((matSize[0], matSize[-1]))
 
 class IEMOCAP(DGLDataset):
-    def __init__(self, nameDataset='IEMOCAP', path = './IEMOCAP_features/IEMOCAP_features.pkl',mergeLabel = False, missing = 0, edgeType = 0):
+    def __init__(self, nameDataset='IEMOCAP', path = './IEMOCAP_features/IEMOCAP_features.pkl',\
+            mergeLabel = False, missing = 0, edgeType = 0, batchSize = 16):
         self.missing = missing
         self.edgeType = edgeType
         self.path = path
         self.dataset = nameDataset
         self.mergeLabel = mergeLabel
+        self.batchSize = batchSize
         super().__init__(name='dataset_DGL')
 
 
@@ -182,7 +184,7 @@ class IEMOCAP(DGLDataset):
         test_mask[n_train:] = True
         self.graph.ndata['train_mask'] = train_mask
         self.graph.ndata['test_mask'] = test_mask
-        self.batched_graph(16)
+        self.batched_graph(self.batchSize)
 
     def __getitem__(self, i):
         return self.graph, self.train, self.test
@@ -214,8 +216,11 @@ class IEMOCAP(DGLDataset):
 # trainset = IEMOCAPDataset()
 # print(trainset[1][0].shape)
 
-trainsetDGL = IEMOCAP()
-a,b,c = trainsetDGL[0]
+# trainsetDGL = IEMOCAP()
+# a,b,c = trainsetDGL[0]
+# dgl.save_graphs('graphPath', a)
+# dgl.save_graphs('graphPath1', b)
+# dgl.save_graphs('graphPath2', c)
 # sgTrain, sgTest = trainsetDGL.batched_graph(16)
 # for ii in range(10, 70, 10):
 #     genMissMultiModal((3, 8), ii)

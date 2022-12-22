@@ -132,8 +132,10 @@ def vis2(info):
     ax.set_zlabel('Z Label')
     plt.show()
 
-def evaluate(g, features, labels, mask, model):
+def evaluate(g, mask, model):
     model.eval()
+    features = g.ndata['feat']
+    labels = g.ndata['label']
     with torch.no_grad():
         logits = model(g, features)
         mask = mask.bool()
