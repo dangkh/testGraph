@@ -69,9 +69,10 @@ class GAT_FP(nn.Module):
         return h
 
 
-def train(g, features, labels, masks, model, info):
+def train(g, labels, masks, model, info):
     # define train/val samples, loss function and optimizer
     train_mask = masks[0].bool()
+    features = g.ndata["feat"]
     if info['MSE'] == False:
         loss_fcn = nn.CrossEntropyLoss()
         # loss_fcn = FocalLoss()
@@ -83,18 +84,12 @@ def train(g, features, labels, masks, model, info):
     for epoch in range(info['numEpoch']):
         model.train()
         logits = model(g, features)
-        if info['MSE'] == True:
-            logits = auxilary(logits)
         loss = loss_fcn(logits[train_mask], labels[train_mask])
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if info['MSE'] == False:
-            acc = evaluate(g, features, labels, train_mask, model)
-            acctest = evaluate(g, features, labels, masks[1], model)
-        else:
-            acc = evaluateMSE(g, features, labels, train_mask, model)
-            acctest = evaluateMSE(g, features, labels, masks[1], model)
+        acc = evaluateMSE(g, features, labels, train_mask, model)
+        acctest = evaluateMSE(g, features, labels, masks[1], model)
         print(
             "Epoch {:05d} | Loss {:.4f} | Accuracy_train {:.4f} | Accuracy_test {:.4f} ".format(
                 epoch, loss.item(), acc, acctest
@@ -182,7 +177,7 @@ if __name__ == "__main__":
         print(model)
         # model training
         print("Training...")
-        highestAcc = train(g, features, labels, masks, model, info)
+        highestAcc = train(g, labels, masks, model, info)
 
         # test the model
         print("Testing...")

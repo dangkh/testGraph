@@ -112,6 +112,7 @@ class IEMOCAP(DGLDataset):
         return x1, x2, x3
 
     def process(self):
+        self.subIdTrain, self.subIdTest = [], []
         inputData = pickle.load(open(self.path, 'rb'), encoding='latin1')
         if self.dataset == 'MELD':
             self.videoIDs, self.videoSpeakers, self.videoLabels, self.videoText,\
@@ -148,14 +149,22 @@ class IEMOCAP(DGLDataset):
         edges_src = []
         edges_dst = []
         counter = 0
-        for dataset in [self.trainVid, self.testVid] :
-            for idx, x in enumerate(dataset):
-                numUtterance = len(self.videoLabels[x])
-                x1, x2, x3 = self.extractEdge(node_features[counter: counter+numUtterance], counter)
-                edge_features.append(x1)
-                edges_src.append(x2)
-                edges_dst.append(x3)
-                counter += numUtterance
+        for idx, x in enumerate(self.trainVid):
+            numUtterance = len(self.videoLabels[x])
+            x1, x2, x3 = self.extractEdge(node_features[counter: counter+numUtterance], counter)
+            edge_features.append(x1)
+            edges_src.append(x2)
+            edges_dst.append(x3)
+            self.subIdTrain.append(np.unique(np.asarray(np.hstack([x2, x3]))))
+            counter += numUtterance
+        for idx, x in enumerate(self.testVid):
+            numUtterance = len(self.videoLabels[x])
+            x1, x2, x3 = self.extractEdge(node_features[counter: counter+numUtterance], counter)
+            edge_features.append(x1)
+            edges_src.append(x2)
+            edges_dst.append(x3)
+            self.subIdTest.append(np.unique(np.asarray(np.hstack([x2, x3]))))
+            counter += numUtterance
         edge_features, edges_src, edges_dst = convertNP2Tensor([ np.hstack(edge_features), np.hstack(edges_src), np.hstack(edges_dst)])
         self.graph = dgl.graph((edges_src, edges_dst), num_nodes=numberNode)
         self.graph.ndata['feat'] = node_features
@@ -173,19 +182,40 @@ class IEMOCAP(DGLDataset):
         test_mask[n_train:] = True
         self.graph.ndata['train_mask'] = train_mask
         self.graph.ndata['test_mask'] = test_mask
+        self.batched_graph(16)
 
     def __getitem__(self, i):
-        return self.graph
+        return self.graph, self.train, self.test
 
     def __len__(self):
         return 1
 
-    def reconstruct(self, typeReconstruct):
-        pass
+    def batched_graph(self, batchSize):
+        self.listGraphTrain = []
+        batchedTrain, batchedTest = None, None
+        startId, rangeSample = 0, batchSize
+        while rangeSample < len(self.trainVid):
+            ids = self.subIdTrain[startId: rangeSample]
+            ids = np.unique(ids[0])
+            startId, rangeSample = startId+ batchSize, rangeSample+batchSize
+            self.listGraphTrain.append(self.graph.subgraph(ids))
+
+        self.listGraphTest = []
+        batchedTrain, batchedTest = None, None
+        startId, rangeSample = 0, batchSize
+        while rangeSample < len(self.testVid):
+            ids = self.subIdTest[startId: rangeSample]
+            ids = np.unique(ids[0])
+            startId, rangeSample = startId+ batchSize, rangeSample+batchSize
+            self.listGraphTest.append(self.graph.subgraph(ids))
+        self.train, self.test = dgl.batch(self.listGraphTrain), dgl.batch(self.listGraphTest)
+        return self.train, self.test
 
 # trainset = IEMOCAPDataset()
 # print(trainset[1][0].shape)
 
-# trainsetDGL = IEMOCAP()
+trainsetDGL = IEMOCAP()
+a,b,c = trainsetDGL[0]
+# sgTrain, sgTest = trainsetDGL.batched_graph(16)
 # for ii in range(10, 70, 10):
 #     genMissMultiModal((3, 8), ii)
