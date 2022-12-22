@@ -82,6 +82,7 @@ def train(g, trainSet, testSet, masks, model, info):
     listTrain = dgl.unbatch(trainSet)
     for epoch in range(info['numEpoch']):
         totalLoss = 0
+        counter = 0
         for graph in listTrain:
             features = graph.ndata["feat"]
             labels = graph.ndata["label"]
@@ -176,6 +177,8 @@ if __name__ == "__main__":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # device = torch.device('cpu')
         g = g.to(device)
+        trainSet = trainSet.to(device)
+        testSet = testSet.to(device)
         features = g.ndata["feat"]
         labels = g.ndata["label"]
         if args.MSE:

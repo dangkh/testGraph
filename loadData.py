@@ -157,7 +157,7 @@ class IEMOCAP(DGLDataset):
             edge_features.append(x1)
             edges_src.append(x2)
             edges_dst.append(x3)
-            self.subIdTrain.append(np.unique(np.asarray(np.hstack([x2, x3]))))
+            self.subIdTrain.append(np.unique(np.asarray(np.hstack([x2, x3]))).reshape(1,-1))
             counter += numUtterance
         for idx, x in enumerate(self.testVid):
             numUtterance = len(self.videoLabels[x])
@@ -165,7 +165,7 @@ class IEMOCAP(DGLDataset):
             edge_features.append(x1)
             edges_src.append(x2)
             edges_dst.append(x3)
-            self.subIdTest.append(np.unique(np.asarray(np.hstack([x2, x3]))))
+            self.subIdTest.append(np.unique(np.asarray(np.hstack([x2, x3]))).reshape(1,-1))
             counter += numUtterance
         edge_features, edges_src, edges_dst = convertNP2Tensor([ np.hstack(edge_features), np.hstack(edges_src), np.hstack(edges_dst)])
         self.graph = dgl.graph((edges_src, edges_dst), num_nodes=numberNode)
@@ -198,10 +198,9 @@ class IEMOCAP(DGLDataset):
         startId, rangeSample = 0, batchSize
         while rangeSample < len(self.trainVid):
             ids = self.subIdTrain[startId: rangeSample]
-            ids = np.unique(ids[0])
+            ids = np.unique(np.hstack(ids))
             startId, rangeSample = startId+ batchSize, rangeSample+batchSize
             self.listGraphTrain.append(self.graph.subgraph(ids))
-
         self.listGraphTest = []
         batchedTrain, batchedTest = None, None
         startId, rangeSample = 0, batchSize
