@@ -95,7 +95,7 @@ if __name__ == "__main__":
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
-    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='.')
+    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl/')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
@@ -129,9 +129,9 @@ if __name__ == "__main__":
             print('*'*10, 'INFO' ,'*'*10, file = sourceFile)
             print(info, file = sourceFile)
             sourceFile.close()
-        graphPath = f'{args.prePath}//graph{args.dataset}.dgl'
+        graphPath = f'{args.prePath}/graph{args.dataset}/{args.dataset}.dgl'
         if args.missing > 0:
-            graphPath = f'{args.prePath}/graph{args.dataset}_missing_{args.missing}_test{test}.dgl'
+            graphPath = f'{args.prePath}/graph{args.dataset}/missing_{args.missing}_test{test}.dgl'
 
         print("generating MM graph")
         if os.path.isfile(graphPath):

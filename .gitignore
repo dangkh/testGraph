@@ -133,3 +133,4 @@ dmypy.json
 4labels.txt
 log.txt
 log*
+*.csv
