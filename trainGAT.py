@@ -11,41 +11,15 @@ from dgl.data import CiteseerGraphDataset, CoraGraphDataset, PubmedGraphDataset
 from loadData import *
 from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader
-# torch.set_default_dtype(torch.float)
+# torch.set_default_dtype(torch.double)
 # import warnings
 # warnings.filterwarnings("ignore", category=UserWarning)
 
-class GAT(nn.Module):
-    def __init__(self, in_size, hid_size, out_size):
-        super().__init__()
-        gcv = [in_size, 512, 32]
-        self.num_heads = 4
-        self.layers = nn.ModuleList()
-        # two-layer GCN
-        for ii in range(len(gcv)-1):
-            self.layers.append(
-                dglnn.GATConv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
-            )
-        self.linear = nn.Linear(gcv[-1] * self.num_heads, out_size)
-        self.dropout = nn.Dropout(0.5)
-
-    def forward(self, g, features):
-        h = features
-        for i, layer in enumerate(self.layers):
-            if i != 0:
-                h = self.dropout(h)
-            h = h.float()
-            h = torch.reshape(h, (len(h), -1))
-            h = layer(g, h)
-        h = torch.reshape(h, (len(h), -1))
-        h = self.linear(h)
-        return h
-
 class GAT_FP(nn.Module):
-    def __init__(self, in_size, hid_size, out_size, numFP):
+    def __init__(self, in_size, hid_size, out_size, wFP, numFP):
         super().__init__()
-        gcv = [in_size, 512, 32]
-        self.num_heads = 1
+        gcv = [in_size, 256, 8]
+        self.num_heads = 4
         self.layers = nn.ModuleList()
         # two-layer GCN
         for ii in range(len(gcv)-1):
@@ -55,11 +29,14 @@ class GAT_FP(nn.Module):
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
         self.linear = nn.Linear(gcv[-1] * np.power(self.num_heads, len(gcv)-1), out_size)
         self.dropout = nn.Dropout(0.5)
-        self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
+        self.wFP = wFP
+        if self.wFP:
+            self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
 
     def forward(self, g, features):
-        h = features
-        h = self.label_propagation(g, features)
+        h = features.float()
+        if self.wFP:
+            h = self.label_propagation(g, features)
         for i, layer in enumerate(self.layers):
             if i != 0:
                 h = self.dropout(h)
@@ -69,7 +46,7 @@ class GAT_FP(nn.Module):
         return h
 
 
-def train(g, masks, model, info):
+def train(g, features, labels, masks, model, info):
     # define train/val samples, loss function and optimizer
     train_mask = masks[0].bool()
     if info['MSE'] == False:
@@ -118,6 +95,7 @@ if __name__ == "__main__":
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
+    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='.')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
@@ -151,16 +129,16 @@ if __name__ == "__main__":
             print('*'*10, 'INFO' ,'*'*10, file = sourceFile)
             print(info, file = sourceFile)
             sourceFile.close()
-        graphPath = f'./graph{args.dataset}/{args.dataset}.dgl'
+        graphPath = f'{args.prePath}//graph{args.dataset}.dgl'
         if args.missing > 0:
-            graphPath = f'./graph{args.dataset}/missing_{args.missing}_test{test}.dgl'
+            graphPath = f'{args.prePath}/graph{args.dataset}_missing_{args.missing}_test{test}.dgl'
 
         print("generating MM graph")
         if os.path.isfile(graphPath):
             (g,), _ = dgl.load_graphs(graphPath)
         else:        
             data = IEMOCAP(args.dataset, f'./{args.dataset}_features/{args.dataset}_features.pkl',args.mergeLabel,args.missing, args.edgeType)
-            g = data[0]
+            g,_,_ = data[0]
             dgl.save_graphs(graphPath, g)
         print("loaded MM graph")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -175,11 +153,9 @@ if __name__ == "__main__":
         # create GCN model
         in_size = features.shape[1]
         out_size = torch.unique(g.ndata['label']).shape[0]
-        if args.wFP:
-            model = GAT_FP(in_size, 128, out_size, args.numFP).to(device)    
-        else:
-            model = GAT(in_size, 128, out_size).to(device)
+        model = GAT_FP(in_size, 128, out_size, args.wFP, args.numFP).to(device)    
         print(model)
+
         # model training
         print("Training...")
         highestAcc = train(g, features, labels, masks, model, info)
