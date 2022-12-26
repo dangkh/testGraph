@@ -24,24 +24,14 @@ class GAT_FP(nn.Module):
         self.num_heads = 4
         self.gat1 = nn.ModuleList()
         # two-layer GCN
-        coef = 1
         for ii in range(len(gcv)-1):
-            if ii > 0:
-                coef = 2
             self.gat1.append(
-                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii] * coef,  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
         self.gat2 = nn.ModuleList()
         
         coef = 1
-        for ii in range(len(gcv)-1):
-            if ii > 0:
-                coef = 2
-            self.gat2.append(
-                MultiHeadGATInnerLayer(np.power(self.num_heads, ii) * gcv[ii] * coef,  gcv[ii+1], num_heads = self.num_heads)
-            )
-        
-
+        self.gat2.append(MultiHeadGATInnerLayer(in_size,  gcv[-1], num_heads = self.num_heads))
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
         self.linear = nn.Linear(gcv[-1] * self.num_heads * 2, out_size)
         self.dropout = nn.Dropout(0.5)
@@ -53,17 +43,18 @@ class GAT_FP(nn.Module):
         h = features
         if self.wFP:
             h = self.label_propagation(g, features)
+        gat2Layer = self.gat2[0]
+        h2 = gat2Layer(g, h)
         for i, layer in enumerate(self.gat1):
             if i != 0:
                 h = self.dropout(h)
             h = h.float()
             h = torch.reshape(h, (len(h), -1))
-            h1 = layer(g, h)
-            h1 = torch.reshape(h1, (len(h1), -1))
-            gat2Layer = self.gat2[i]
-            h2 = gat2Layer(g, h)
-            h = torch.cat((h1,h2), 1)
+            h = layer(g, h)
+        
+
         h = torch.reshape(h, (len(h), -1))
+        h = torch.cat((h,h2), 1)
         h = self.linear(h)
         return h
 
