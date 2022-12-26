@@ -11,6 +11,7 @@ from dgl.data import CiteseerGraphDataset, CoraGraphDataset, PubmedGraphDataset
 from loadData import *
 from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader
+from AttentionInnerModule import *
 # torch.set_default_dtype(torch.float)
 # import warnings
 # warnings.filterwarnings("ignore", category=UserWarning)
@@ -21,14 +22,28 @@ class GAT_FP(nn.Module):
         super().__init__()
         gcv = [in_size, 256, 8]
         self.num_heads = 4
-        self.layers = nn.ModuleList()
+        self.gat1 = nn.ModuleList()
         # two-layer GCN
+        coef = 1
         for ii in range(len(gcv)-1):
-            self.layers.append(
-                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
+            if ii > 0:
+                coef = 2
+            self.gat1.append(
+                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii] * coef,  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
+        self.gat2 = nn.ModuleList()
+        
+        coef = 1
+        for ii in range(len(gcv)-1):
+            if ii > 0:
+                coef = 2
+            self.gat2.append(
+                MultiHeadGATInnerLayer(np.power(self.num_heads, ii) * gcv[ii] * coef,  gcv[ii+1], num_heads = self.num_heads)
+            )
+        
+
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
-        self.linear = nn.Linear(gcv[-1] * self.num_heads, out_size)
+        self.linear = nn.Linear(gcv[-1] * self.num_heads * 2, out_size)
         self.dropout = nn.Dropout(0.5)
         self.wFP = wFP
         if self.wFP:
@@ -38,12 +53,16 @@ class GAT_FP(nn.Module):
         h = features
         if self.wFP:
             h = self.label_propagation(g, features)
-        for i, layer in enumerate(self.layers):
+        for i, layer in enumerate(self.gat1):
             if i != 0:
                 h = self.dropout(h)
             h = h.float()
             h = torch.reshape(h, (len(h), -1))
-            h = layer(g, h)
+            h1 = layer(g, h)
+            h1 = torch.reshape(h1, (len(h1), -1))
+            gat2Layer = self.gat2[i]
+            h2 = gat2Layer(g, h)
+            h = torch.cat((h1,h2), 1)
         h = torch.reshape(h, (len(h), -1))
         h = self.linear(h)
         return h
@@ -98,7 +117,7 @@ if __name__ == "__main__":
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
-    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl/')
+    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='.')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
@@ -143,13 +162,14 @@ if __name__ == "__main__":
         print("generating MM graph")
         if os.path.isfile(graphPath):
             (g,), _ = dgl.load_graphs(graphPath)
-            (trainSet,), _ = dgl.load_graphs(trainPath)
+            (trainSet), _ = dgl.load_graphs(trainPath)
             (testSet,), _ = dgl.load_graphs(testPath)
+            trainSet = dgl.batch(trainSet)
         else:        
             data = IEMOCAP()
             g, trainSet, testSet = data[0]
             dgl.save_graphs(graphPath, g)
-            dgl.save_graphs(trainPath, trainSet)
+            dgl.save_graphs(trainPath, dgl.unbatch(trainSet))
             dgl.save_graphs(testPath, testSet)
         print("loaded MM graph")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -171,7 +191,6 @@ if __name__ == "__main__":
         # model training
         print("Training...")
         highestAcc = train(g, trainSet, testSet, masks, model, info)
-
         # test the model
         print("Testing...")
         print(features.shape)
