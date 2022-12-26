@@ -9,6 +9,7 @@ class GATInnerLayer(nn.Module):
     def __init__(self, in_dim, out_dim):
         super(GATInnerLayer, self).__init__()
         self.in_dim = in_dim
+        self.out_dim = out_dim
         self.qMask = nn.Linear(in_dim, out_dim, bias=False)
         self.kMask = nn.Linear(in_dim, out_dim, bias=False)
         self.vMask = nn.Linear(in_dim, out_dim, bias=False)
@@ -59,7 +60,7 @@ class GATInnerLayer(nn.Module):
         vVal = self.vMask(h)
         qVal = torch.unsqueeze(qVal, 2)
         kVal = torch.unsqueeze(kVal, 1)
-        score = (qVal @ kVal)  / np.sqrt(self.in_dim)
+        score = (qVal @ kVal)  / np.sqrt(self.out_dim)
         score = F.softmax(score, dim=1)
         origin = torch.unsqueeze(vVal, 2)
         attVal = torch.bmm(score, origin).sum(dim = 2)

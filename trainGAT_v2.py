@@ -32,7 +32,7 @@ class GAT_FP(nn.Module):
         self.dropout = nn.Dropout(0.5)
         self.wFP = wFP
         if self.wFP:
-            self.label_propagation = LabelPropagation(k=1, alpha=0.5, clamp=False, normalize=True)
+            self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
 
     def forward(self, g, features):
         h = features
