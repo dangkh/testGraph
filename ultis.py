@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import ListedColormap
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def seed_everything(seed=seed):
     random.seed(seed)
@@ -172,4 +173,4 @@ def convertX2Binary(labels):
         newll[ll] = 1
         listLabel.append(newll)
     r = torch.stack(listLabel )
-    return r.cuda()
+    return r.to(device)

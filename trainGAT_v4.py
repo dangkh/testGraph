@@ -51,23 +51,21 @@ class GAT_FP(nn.Module):
         coef = 1
         self.gat2.append(MultiHeadGATInnerLayer(in_size,  gcv[-1], num_heads = self.num_heads))
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
-        self.linear = nn.Linear(gcv[-1] * self.num_heads, out_size)
+        self.linear = nn.Linear(gcv[-1] * self.num_heads * 3, out_size)
         self.dropout = nn.Dropout(0.75)
         self.wFP = wFP
         if self.wFP:
             self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
 
     def forward(self, g, features):
-        # h = features.float()
-        # h = features * self.textMask + features * self.audioMask + features * self.videoMask
-        h = features.float() @ self.testM.float()
-        # return h.float()
-        # h = h.float()
+        h = features.float()
         gat2Layer = self.gat2[0]
-        h2 = gat2Layer(g, h)
+        # h2 = gat2Layer(g, h)
         if self.wFP:
             h = self.label_propagation(g, features)
-        # h3 = gat2Layer(g, h)
+        h = features * self.textMask + features * self.audioMask + features * self.videoMask
+        h = h.float()
+        h3 = gat2Layer(g, h)
         for i, layer in enumerate(self.gat1):
             if i != 0:
                 h = self.dropout(h)
@@ -77,7 +75,7 @@ class GAT_FP(nn.Module):
         
 
         h = torch.reshape(h, (len(h), -1))
-        # h = torch.cat((h3,h,h3), 1)
+        h = torch.cat((h3,h,h3), 1)
         h = self.linear(h)
         return h
 
@@ -105,10 +103,14 @@ def train(g, trainSet, testSet, masks, model, info):
             loss = loss_fcn(logits, labels)
             totalLoss += loss.item()
             optimizer.zero_grad()
-            model.testM.retain_grad()
+            model.textMask.retain_grad()
+            model.videoMask.retain_grad()
+            model.audioMask.retain_grad()
             loss.backward()
-            print(model.testM.grad)
             optimizer.step()
+            model.textMask = model.textMask - model.textMask.grad
+            model.videoMask = model.videoMask - model.videoMask.grad
+            model.audioMask = model.audioMask - model.audioMask.grad
             stop
         acc = evaluate(g, masks[0], model)
         acctest = evaluate(g, masks[1], model)
@@ -157,7 +159,6 @@ if __name__ == "__main__":
             'numFP': args.numFP,
             'MSE': args.MSE
         }
-
     for test in range(args.numTest):
         if args.seed == 'random':
             setSeed = random.randint(1, 100001)
