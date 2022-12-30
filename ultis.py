@@ -158,7 +158,7 @@ def evaluateMSE(g, features, labels, mask, model, visual = False, originalLabel 
         # _, indices = torch.max(logits, dim=1)
         # correct = torch.sum(indices == labels)
         if visual:
-            logits = auxilary(logits)
+            # logits = auxilary(logits)
             originalLabel = originalLabel[mask]
             vis2([logits.cpu(), originalLabel.cpu()])
         return meanSquareD
@@ -166,6 +166,7 @@ def evaluateMSE(g, features, labels, mask, model, visual = False, originalLabel 
 def convertX2Binary(labels):
     listLabel = []
     sizeLabel = len(np.unique(labels.cpu()))
+    # sizeLabel = 6
     for ll in labels:
         newll = torch.zeros(sizeLabel)
         newll[ll] = 1

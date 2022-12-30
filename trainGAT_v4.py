@@ -21,7 +21,25 @@ class GAT_FP(nn.Module):
     def __init__(self, in_size, hid_size, out_size, wFP, numFP):
         super().__init__()
         gcv = [in_size, 256, 8]
-        self.num_heads = 2
+        self.num_heads = 4
+        currentFeatures = np.asarray([0.0] * 2029)
+        textMask = np.copy(currentFeatures)
+        textMask[:100] = 1.0
+        audioMask = np.copy(currentFeatures)
+        audioMask[100: 442] = 1.0
+        videoMask = np.copy(currentFeatures)
+        videoMask[442:] = 1.0
+        self.textMask = torch.from_numpy(textMask).to(device)
+        self.coText = torch.tensor(3.0, requires_grad=True)
+        self.textMask = self.textMask * self.coText
+
+        self.audioMask = torch.from_numpy(audioMask).to(device)
+        self.coAudi = torch.tensor(2.0, requires_grad=True)
+        self.audioMask = self.audioMask * self.coAudi
+        
+        self.videoMask = torch.from_numpy(videoMask).to(device)
+        self.coVisu = torch.tensor(1.0, requires_grad=True)
+        self.videoMask = self.videoMask * self.coVisu
         self.gat1 = nn.ModuleList()
         # two-layer GCN
         for ii in range(len(gcv)-1):
@@ -33,19 +51,23 @@ class GAT_FP(nn.Module):
         coef = 1
         self.gat2.append(MultiHeadGATInnerLayer(in_size,  gcv[-1], num_heads = self.num_heads))
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
-        self.linear = nn.Linear(gcv[-1] * self.num_heads * 3, out_size)
+        self.linear = nn.Linear(gcv[-1] * self.num_heads, out_size)
         self.dropout = nn.Dropout(0.75)
         self.wFP = wFP
         if self.wFP:
             self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
 
     def forward(self, g, features):
-        h = features.float()
+        # h = features.float()
+        # h = features * self.textMask + features * self.audioMask + features * self.videoMask
+        h = features.float() @ self.testM.float()
+        # return h.float()
+        # h = h.float()
         gat2Layer = self.gat2[0]
         h2 = gat2Layer(g, h)
         if self.wFP:
             h = self.label_propagation(g, features)
-        h3 = gat2Layer(g, h)
+        # h3 = gat2Layer(g, h)
         for i, layer in enumerate(self.gat1):
             if i != 0:
                 h = self.dropout(h)
@@ -55,7 +77,7 @@ class GAT_FP(nn.Module):
         
 
         h = torch.reshape(h, (len(h), -1))
-        h = torch.cat((h3,h,h3), 1)
+        # h = torch.cat((h3,h,h3), 1)
         h = self.linear(h)
         return h
 
@@ -77,14 +99,17 @@ def train(g, trainSet, testSet, masks, model, info):
         for graph in listTrain:
             features = graph.ndata["feat"]
             labels = graph.ndata["label"]
-            labels = convertX2Binary(labels)
+            # labels = convertX2Binary(labels)
             model.train()
             logits = model(graph, features)
-            loss = torch.sqrt(loss_fcn(logits, labels))
+            loss = loss_fcn(logits, labels)
             totalLoss += loss.item()
             optimizer.zero_grad()
+            model.testM.retain_grad()
             loss.backward()
+            print(model.testM.grad)
             optimizer.step()
+            stop
         acc = evaluate(g, masks[0], model)
         acctest = evaluate(g, masks[1], model)
         print(
@@ -185,6 +210,8 @@ if __name__ == "__main__":
         # model training
         print("Training...")
         highestAcc = train(g, trainSet, testSet, masks, model, info)
+        print(model.coText)
+        stop
         # test the model
         print("Testing...")
         print(features.shape)
@@ -193,8 +220,8 @@ if __name__ == "__main__":
         else:
             labels = g.ndata["label"]
             acc = evaluate(g, masks[1], model)
-            labels = convertX2Binary(labels)
-            evaluateMSE(g, features, labels, masks[0], model, visual=True, originalLabel=g.ndata["label"])
+            # labels = convertX2Binary(labels)
+            # evaluateMSE(g, features, labels, masks[0], model, visual=True, originalLabel=g.ndata["label"])
         print("Final Test accuracy {:.4f}".format(acc))
 
         if args.log:
