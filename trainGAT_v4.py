@@ -16,56 +16,68 @@ from AttentionInnerModule import *
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
-
-class GAT_FP(nn.Module):
-    def __init__(self, in_size, hid_size, out_size, wFP, numFP):
+class maskFilter(nn.Module):
+    def __init__(self, in_size):
         super().__init__()
-        gcv = [in_size, 256, 8]
-        self.num_heads = 4
-        currentFeatures = np.asarray([0.0] * 2029)
+        # self.testM = nn.Parameter(torch.rand(in_size, in_size))
+        currentFeatures = np.asarray([0.0] * in_size)
         textMask = np.copy(currentFeatures)
         textMask[:100] = 1.0
         audioMask = np.copy(currentFeatures)
         audioMask[100: 442] = 1.0
         videoMask = np.copy(currentFeatures)
         videoMask[442:] = 1.0
-        self.textMask = torch.from_numpy(textMask).to(device)
-        self.coText = torch.tensor(3.0, requires_grad=True)
-        self.textMask = self.textMask * self.coText
-
-        self.audioMask = torch.from_numpy(audioMask).to(device)
-        self.coAudi = torch.tensor(2.0, requires_grad=True)
-        self.audioMask = self.audioMask * self.coAudi
+        self.textMask = torch.from_numpy(textMask) * torch.tensor(3.0)
+        self.textMask = nn.Parameter(self.textMask).float()
         
-        self.videoMask = torch.from_numpy(videoMask).to(device)
-        self.coVisu = torch.tensor(1.0, requires_grad=True)
-        self.videoMask = self.videoMask * self.coVisu
+        self.audioMask = torch.from_numpy(audioMask) * torch.tensor(2.0)
+        self.audioMask = nn.Parameter(self.audioMask).float()
+        
+        self.videoMask = torch.from_numpy(videoMask) * torch.tensor(1.0)
+        self.videoMask = nn.Parameter(self.videoMask).float()
+
+
+    def forward(self, features):
+        return features * self.textMask + features * self.audioMask + features * self.videoMask
+
+    def string(self):
+        """
+        Just like any class in Python, you can also define custom method on PyTorch modules
+        """
+        return f'y = {self.textMask.item()} + {self.audioMask.item()} + {self.videoMask.item()}'
+
+class GAT_FP(nn.Module):
+    def __init__(self, in_size, hid_size, out_size, wFP, numFP):
+        super().__init__()
+        gcv = [in_size, 256, 8]
+        self.maskFilter = maskFilter(2029)
+        self.num_heads = 4
+        
         self.gat1 = nn.ModuleList()
         # two-layer GCN
         for ii in range(len(gcv)-1):
             self.gat1.append(
                 dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
-        self.gat2 = nn.ModuleList()
-        
         coef = 1
-        self.gat2.append(MultiHeadGATInnerLayer(in_size,  gcv[-1], num_heads = self.num_heads))
+        self.gat2 = MultiHeadGATInnerLayer(in_size,  gcv[-1], num_heads = self.num_heads)
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
-        self.linear = nn.Linear(gcv[-1] * self.num_heads * 3, out_size)
-        self.dropout = nn.Dropout(0.75)
+        # self.linear = nn.Linear(gcv[-1] * self.num_heads * 3, out_size)
+        self.linear = nn.Linear(gcv[-1] * self.num_heads * 7, out_size)
+        self.dropout = nn.Dropout(0.5)
         self.wFP = wFP
         if self.wFP:
             self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
 
     def forward(self, g, features):
         h = features.float()
-        gat2Layer = self.gat2[0]
-        # h2 = gat2Layer(g, h)
+        # h2 = self.gat2(g, h)
         if self.wFP:
             h = self.label_propagation(g, features)
-        h = features * self.textMask + features * self.audioMask + features * self.videoMask
-        h = h.float()
-        h3 = gat2Layer(g, h)
+        # h = h.float()
+        # h = h @ self.textMask 
+        h = self.maskFilter(h)
+        h3 = self.gat2(g, h)
         for i, layer in enumerate(self.gat1):
             if i != 0:
                 h = self.dropout(h)
@@ -73,7 +85,6 @@ class GAT_FP(nn.Module):
             h = torch.reshape(h, (len(h), -1))
             h = layer(g, h)
         
-
         h = torch.reshape(h, (len(h), -1))
         h = torch.cat((h3,h,h3), 1)
         h = self.linear(h)
@@ -103,15 +114,8 @@ def train(g, trainSet, testSet, masks, model, info):
             loss = loss_fcn(logits, labels)
             totalLoss += loss.item()
             optimizer.zero_grad()
-            model.textMask.retain_grad()
-            model.videoMask.retain_grad()
-            model.audioMask.retain_grad()
             loss.backward()
             optimizer.step()
-            model.textMask = model.textMask - model.textMask.grad
-            model.videoMask = model.videoMask - model.videoMask.grad
-            model.audioMask = model.audioMask - model.audioMask.grad
-            stop
         acc = evaluate(g, masks[0], model)
         acctest = evaluate(g, masks[1], model)
         print(
@@ -207,12 +211,14 @@ if __name__ == "__main__":
         in_size = features.shape[1]
         out_size = torch.unique(g.ndata['label']).shape[0]
         model = GAT_FP(in_size, 128, out_size, args.wFP, args.numFP).to(device)    
+        # for name, param in model.named_parameters():
+        #     if param.requires_grad:
+        #         print(name, param.data)
+        # stop
         print(model)
         # model training
         print("Training...")
         highestAcc = train(g, trainSet, testSet, masks, model, info)
-        print(model.coText)
-        stop
         # test the model
         print("Testing...")
         print(features.shape)

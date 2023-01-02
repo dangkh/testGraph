@@ -71,13 +71,69 @@ class GATInnerLayer(nn.Module):
         # g.update_all(self.message_func, self.reduce_func)
         # return g.ndata.pop('h')
 
+class GATInnerLayer_v2(nn.Module):
+    def __init__(self, in_dim, out_dim):
+        super(GATInnerLayer_v2, self).__init__()
+        currentFeatures = np.asarray([0.0] * in_dim)
+        textMask = np.copy(currentFeatures)
+        textMask[:100] = 1.0
+        audioMask = np.copy(currentFeatures)
+        audioMask[100: 442] = 1.0
+        videoMask = np.copy(currentFeatures)
+        videoMask[442:] = 1.0
+        self.in_dim = in_dim
+        self.out_dim = out_dim
+        self.qMaskT = nn.Linear(100, out_dim, bias=False)
+        self.qMaskA = nn.Linear(342, out_dim, bias=False)
+        self.qMaskV = nn.Linear(1587, out_dim, bias=False)
+        self.kMaskT = nn.Linear(100, out_dim, bias=False)
+        self.kMaskA = nn.Linear(342, out_dim, bias=False)
+        self.kMaskV = nn.Linear(1587, out_dim, bias=False)
+        self.vMaskT = nn.Linear(100, out_dim, bias=False)
+        self.vMaskA = nn.Linear(342, out_dim, bias=False)
+        self.vMaskV = nn.Linear(1587, out_dim, bias=False)
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        """Reinitialize learnable parameters."""
+        gain = nn.init.calculate_gain('relu')
+        nn.init.xavier_normal_(self.qMaskT.weight, gain=gain)
+        nn.init.xavier_normal_(self.kMaskT.weight, gain=gain)
+        nn.init.xavier_normal_(self.vMaskT.weight, gain=gain)
+        nn.init.xavier_normal_(self.qMaskA.weight, gain=gain)
+        nn.init.xavier_normal_(self.kMaskA.weight, gain=gain)
+        nn.init.xavier_normal_(self.vMaskA.weight, gain=gain)
+        nn.init.xavier_normal_(self.qMaskV.weight, gain=gain)
+        nn.init.xavier_normal_(self.kMaskV.weight, gain=gain)
+        nn.init.xavier_normal_(self.vMaskV.weight, gain=gain)
+
+    def unitAtt(self, q, k, v, feature):
+        qVal = q(feature)
+        kVal = k(feature)
+        vVal = v(feature)
+        qVal = torch.unsqueeze(qVal, 2)
+        kVal = torch.unsqueeze(kVal, 1)
+        score = (qVal @ kVal)  / np.sqrt(self.out_dim)
+        score = F.softmax(score, dim=1)
+        origin = torch.unsqueeze(vVal, 2)
+        attVal = torch.bmm(score, origin).sum(dim = 2)
+        return attVal
+
+    def forward(self, g, h):
+        attT = self.unitAtt(self.qMaskT, self.kMaskT, self.vMaskT, h[:,:100])
+        attA = self.unitAtt(self.qMaskA, self.kMaskA, self.vMaskA, h[:,100:442])
+        attV = self.unitAtt(self.qMaskV, self.kMaskV, self.vMaskV, h[:,442:])
+        att = torch.cat((attT, attA, attV), dim = 1)
+        return att
+       
+
 
 class MultiHeadGATInnerLayer(nn.Module):
     def __init__(self, in_dim, out_dim, num_heads, merge='cat'):
         super(MultiHeadGATInnerLayer, self).__init__()
         self.heads = nn.ModuleList()
         for i in range(num_heads):
-            self.heads.append(GATInnerLayer(in_dim, out_dim))
+            self.heads.append(GATInnerLayer_v2(in_dim, out_dim))
         self.merge = merge
 
     def forward(self, g, h):
