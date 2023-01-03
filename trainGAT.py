@@ -119,7 +119,8 @@ if __name__ == "__main__":
 
     for test in range(args.numTest):
         if args.seed == 'random':
-            setSeed = random.randint(1, 100001)
+            # setSeed = random.randint(1, 100001)
+            setSeed = seedList[test]
             info['seed'] = setSeed
         else:
             setSeed = int(args.seed)

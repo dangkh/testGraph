@@ -92,6 +92,7 @@ class GATInnerLayer_v2(nn.Module):
         self.vMaskT = nn.Linear(100, out_dim, bias=False)
         self.vMaskA = nn.Linear(342, out_dim, bias=False)
         self.vMaskV = nn.Linear(1587, out_dim, bias=False)
+        self.ln = nn.Linear(out_dim * 3, out_dim, bias = True)
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -124,6 +125,7 @@ class GATInnerLayer_v2(nn.Module):
         attA = self.unitAtt(self.qMaskA, self.kMaskA, self.vMaskA, h[:,100:442])
         attV = self.unitAtt(self.qMaskV, self.kMaskV, self.vMaskV, h[:,442:])
         att = torch.cat((attT, attA, attV), dim = 1)
+        att = self.ln(att)
         return att
        
 

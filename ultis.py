@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import ListedColormap
 
+
+seedList = [86503, 37949, 5288, 22627, 75258, 94877, 9829, 47702, 15908, 75918]
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def seed_everything(seed=seed):

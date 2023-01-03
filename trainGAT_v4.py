@@ -28,13 +28,13 @@ class maskFilter(nn.Module):
         videoMask = np.copy(currentFeatures)
         videoMask[442:] = 1.0
         self.textMask = torch.from_numpy(textMask) * torch.tensor(3.0)
-        self.textMask = nn.Parameter(self.textMask).float()
+        self.textMask = nn.Parameter(self.textMask).float().to(device)
         
         self.audioMask = torch.from_numpy(audioMask) * torch.tensor(2.0)
-        self.audioMask = nn.Parameter(self.audioMask).float()
+        self.audioMask = nn.Parameter(self.audioMask).float().to(device)
         
         self.videoMask = torch.from_numpy(videoMask) * torch.tensor(1.0)
-        self.videoMask = nn.Parameter(self.videoMask).float()
+        self.videoMask = nn.Parameter(self.videoMask).float().to(device)
 
 
     def forward(self, features):
@@ -62,8 +62,8 @@ class GAT_FP(nn.Module):
         coef = 1
         self.gat2 = MultiHeadGATInnerLayer(in_size,  gcv[-1], num_heads = self.num_heads)
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
-        # self.linear = nn.Linear(gcv[-1] * self.num_heads * 3, out_size)
-        self.linear = nn.Linear(gcv[-1] * self.num_heads * 7, out_size)
+        self.linear = nn.Linear(gcv[-1] * self.num_heads * 2, out_size)
+        # self.linear = nn.Linear(gcv[-1] * self.num_heads * 7, out_size)
         self.dropout = nn.Dropout(0.5)
         self.wFP = wFP
         if self.wFP:
@@ -71,11 +71,8 @@ class GAT_FP(nn.Module):
 
     def forward(self, g, features):
         h = features.float()
-        # h2 = self.gat2(g, h)
         if self.wFP:
             h = self.label_propagation(g, features)
-        # h = h.float()
-        # h = h @ self.textMask 
         h = self.maskFilter(h)
         h3 = self.gat2(g, h)
         for i, layer in enumerate(self.gat1):
@@ -86,7 +83,7 @@ class GAT_FP(nn.Module):
             h = layer(g, h)
         
         h = torch.reshape(h, (len(h), -1))
-        h = torch.cat((h3,h,h3), 1)
+        h = torch.cat((h3,h), 1)
         h = self.linear(h)
         return h
 
@@ -142,7 +139,7 @@ if __name__ == "__main__":
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
-    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='.')
+    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
@@ -157,7 +154,7 @@ if __name__ == "__main__":
             'lr': args.lr, 
             'weight_decay': args.weight_decay,
             'missing': args.missing,
-            'seed': 'random',
+            'seed': args.seed,
             'numTest': args.numTest,
             'wFP': args.wFP,
             'numFP': args.numFP,
@@ -165,7 +162,7 @@ if __name__ == "__main__":
         }
     for test in range(args.numTest):
         if args.seed == 'random':
-            setSeed = random.randint(1, 100001)
+            setSeed = seedList[test]
             info['seed'] = setSeed
         else:
             setSeed = int(args.seed)

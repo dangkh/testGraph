@@ -122,7 +122,8 @@ if __name__ == "__main__":
 
     for test in range(args.numTest):
         if args.seed == 'random':
-            setSeed = random.randint(1, 100001)
+            # setSeed = random.randint(1, 100001)
+            setSeed = seedList[test]
             info['seed'] = setSeed
         else:
             setSeed = int(args.seed)
@@ -143,13 +144,14 @@ if __name__ == "__main__":
         print("generating MM graph")
         if os.path.isfile(graphPath):
             (g,), _ = dgl.load_graphs(graphPath)
-            (trainSet,), _ = dgl.load_graphs(trainPath)
+            (trainSet), _ = dgl.load_graphs(trainPath)
             (testSet,), _ = dgl.load_graphs(testPath)
+            trainSet = dgl.batch(trainSet)
         else:        
             data = IEMOCAP()
             g, trainSet, testSet = data[0]
             dgl.save_graphs(graphPath, g)
-            dgl.save_graphs(trainPath, trainSet)
+            dgl.save_graphs(trainPath, dgl.unbatch(trainSet))
             dgl.save_graphs(testPath, testSet)
         print("loaded MM graph")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
