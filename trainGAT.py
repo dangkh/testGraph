@@ -138,7 +138,10 @@ if __name__ == "__main__":
         if os.path.isfile(graphPath):
             (g,), _ = dgl.load_graphs(graphPath)
         else:        
-            data = IEMOCAP(args.dataset, f'./{args.dataset}_features/{args.dataset}_features.pkl',args.mergeLabel,args.missing, args.edgeType)
+            dataPath  = './IEMOCAP_features/IEMOCAP_features.pkl'
+            if args.dataset == 'MELD':
+                dataPath  = './MELD_features/MELD_features.pkl'
+            data = IEMOCAP(missing = args.missing, nameDataset = args.dataset, path = dataPath)
             g,_,_ = data[0]
             dgl.save_graphs(graphPath, g)
         print("loaded MM graph")

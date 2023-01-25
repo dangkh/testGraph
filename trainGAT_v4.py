@@ -19,14 +19,17 @@ warnings.filterwarnings("ignore", category=UserWarning)
 class maskFilter(nn.Module):
     def __init__(self, in_size):
         super().__init__()
+        tt, aa, vv  = 100, 442, 2024
+        if in_size == 1247:
+            tt, aa, vv  = 600, 942, 1242
         # self.testM = nn.Parameter(torch.rand(in_size, in_size))
         currentFeatures = np.asarray([0.0] * in_size)
         textMask = np.copy(currentFeatures)
-        textMask[:100] = 1.0
+        textMask[:tt] = 1.0
         audioMask = np.copy(currentFeatures)
-        audioMask[100: 442] = 1.0
+        audioMask[tt: aa] = 1.0
         videoMask = np.copy(currentFeatures)
-        videoMask[442:] = 1.0
+        videoMask[aa:] = 1.0
         self.textMask = torch.from_numpy(textMask) * torch.tensor(3.0)
         self.textMask = nn.Parameter(self.textMask).float().to(device)
         
@@ -50,7 +53,7 @@ class GAT_FP(nn.Module):
     def __init__(self, in_size, hid_size, out_size, wFP, numFP):
         super().__init__()
         gcv = [in_size, 256, 8]
-        self.maskFilter = maskFilter(2029)
+        self.maskFilter = maskFilter(in_size)
         self.num_heads = 4
         
         self.gat1 = nn.ModuleList()
@@ -187,7 +190,10 @@ if __name__ == "__main__":
             (testSet,), _ = dgl.load_graphs(testPath)
             trainSet = dgl.batch(trainSet)
         else:        
-            data = IEMOCAP()
+            dataPath  = './IEMOCAP_features/IEMOCAP_features.pkl'
+            if args.dataset == 'MELD':
+                dataPath  = './MELD_features/MELD_features.pkl'
+            data = IEMOCAP(missing = args.missing, nameDataset = args.dataset, path = dataPath)
             g, trainSet, testSet = data[0]
             dgl.save_graphs(graphPath, g)
             dgl.save_graphs(trainPath, dgl.unbatch(trainSet))

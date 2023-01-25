@@ -148,7 +148,10 @@ if __name__ == "__main__":
             (testSet,), _ = dgl.load_graphs(testPath)
             trainSet = dgl.batch(trainSet)
         else:        
-            data = IEMOCAP()
+            dataPath  = './IEMOCAP_features/IEMOCAP_features.pkl'
+            if args.dataset == 'MELD':
+                dataPath  = './MELD_features/MELD_features.pkl'
+            data = IEMOCAP(missing = args.missing, nameDataset = args.dataset, path = dataPath)
             g, trainSet, testSet = data[0]
             dgl.save_graphs(graphPath, g)
             dgl.save_graphs(trainPath, dgl.unbatch(trainSet))

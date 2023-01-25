@@ -35,6 +35,8 @@ def genMissMultiModal(matSize, percent):
         errPecent = 20
     listMask = []
     masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]])]
+    if percent > 60:
+        masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]]*7)]
     for mask, num in ([0, al], [1, be], [2, ga]):
         if num > 0:
             listMask.append(np.repeat(masks[mask], num, axis = 0))
@@ -68,6 +70,7 @@ class IEMOCAP(DGLDataset):
         video = np.asarray(x3)
         speakers = torch.FloatTensor([[1]*5 if x=='M' else [0]*5 for x in x4])
         # 100, 342, 1582, 5
+        # 600, 342, 300, 5
         output = np.hstack([text, audio, video, speakers])
         return output    
 
@@ -78,9 +81,12 @@ class IEMOCAP(DGLDataset):
             self.missingMask = genMissMultiModal((3, numUtterance), self.missing)
             for ii in range(numUtterance):
                 currentFeatures = datas[ii]
-                text = currentFeatures[:100]
-                audio = currentFeatures[100: 442]
-                video = currentFeatures[442: 442+1582]
+                tt, aa, vv  = 100, 442, 2024
+                if self.dataset =="MELD":
+                    tt, aa, vv  = 600, 942, 1242
+                text = currentFeatures[:tt]
+                audio = currentFeatures[tt: aa]
+                video = currentFeatures[aa: vv]
                 if self.missingMask[0][ii] == 1:
                     text[:] = 0
                 if self.missingMask[1][ii] == 1:
@@ -221,5 +227,6 @@ class IEMOCAP(DGLDataset):
 # dgl.save_graphs('graphPath1', b)
 # dgl.save_graphs('graphPath2', c)
 # sgTrain, sgTest = trainsetDGL.batched_graph(16)
-# for ii in range(10, 70, 10):
-#     genMissMultiModal((3, 8), ii)
+# for ii in range(100):
+#     print(ii)
+#     genMissMultiModal((3, ii), 66)
