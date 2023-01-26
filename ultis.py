@@ -141,7 +141,7 @@ def evaluate(g, mask, model):
     features = g.ndata['feat']
     labels = g.ndata['label']
     with torch.no_grad():
-        logits,_ = model(g, features)
+        logits = model(g, features)
         mask = mask.bool()
         # logits = auxilary(logits)
         logits = logits[mask]
@@ -154,7 +154,7 @@ def evaluate(g, mask, model):
 def evaluateMSE(g, features, labels, mask, model, visual = False, originalLabel = None):
     model.eval()
     with torch.no_grad():
-        logits,_ = model(g, features)
+        logits = model(g, features)
         logits = logits[mask]
         labels = labels[mask]
         d = logits - labels

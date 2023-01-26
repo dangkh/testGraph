@@ -57,15 +57,15 @@ class GAT_FP(nn.Module):
         gcv = [in_size, 256, 8]
         self.maskFilter = maskFilter(in_size)
         self.num_heads = 4
-        
+        self.GATFP = dglnn.GATConv(in_size,  in_size, activation=F.relu,  residual=False, num_heads = 1)
         self.gat1 = nn.ModuleList()
         # two-layer GCN
         for ii in range(len(gcv)-1):
             self.gat1.append(
-                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], num_heads = self.num_heads, attn_drop = 0.1)
+                dglnn.GATv2Conv(np.power(self.num_heads, ii) * gcv[ii],  gcv[ii+1], activation=F.relu,  residual=True, num_heads = self.num_heads)
             )
         coef = 1
-        self.gat2 = MultiHeadGATInnerLayer_v2(in_size,  gcv[-1], num_heads = self.num_heads)
+        self.gat2 = MultiHeadGATInnerLayer(in_size,  gcv[-1], num_heads = self.num_heads)
         # self.layers.append(dglnn.GraphConv(hid_size, 16))
         self.linear = nn.Linear(gcv[-1] * self.num_heads * 2, out_size)
         # self.linear = nn.Linear(gcv[-1] * self.num_heads * 7, out_size)
@@ -76,10 +76,19 @@ class GAT_FP(nn.Module):
 
     def forward(self, g, features):
         h = features.float()
-        if self.wFP:
-            h = self.label_propagation(g, features)
+        mask = torch.zeros(h.shape)
+        # if self.wFP:
+        #     h = self.label_propagation(g, features)
+        h1 = self.GATFP(g, h)
+        missIndx = torch.where(features==0)
+        mask[missIndx] = 1
+        # print(missIndx)
+        # print(features)
+        # stop
+        h1 = torch.reshape(h1, (len(h1), -1))
+        h = h + h1 * mask
         h = self.maskFilter(h)
-        h3, diff = self.gat2(g, h)
+        h3 = self.gat2(g, h)
         for i, layer in enumerate(self.gat1):
             if i != 0:
                 h = self.dropout(h)
@@ -90,7 +99,7 @@ class GAT_FP(nn.Module):
         h = torch.reshape(h, (len(h), -1))
         h = torch.cat((h3,h), 1)
         h = self.linear(h)
-        return h, diff
+        return h
 
 
 def label2negative(indx, lenL):
@@ -108,55 +117,30 @@ def train(g, trainSet, testSet, masks, model, info):
         loss_fcn = nn.CrossEntropyLoss()
         # loss_fcn = FocalLoss()
     else:
-        # loss_fcn1 = nn.MSELoss()
-        loss_fcn1 = nn.TripletMarginLoss(margin=0.5, p=1)
-        loss_fcn2 = nn.MSELoss()
+        loss_fcn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=info['lr'], weight_decay=info['weight_decay'])
     # optimizer = torch.optim.SGD(model.parameters(), lr=info['lr'], momentum=1.0)
     highestAcc = 0
     # training loop
     listTrain = dgl.unbatch(trainSet)
-    graphLabel = []
-    for graph in listTrain:
-        label2ft = []
-        ulabels = graph.ndata["label"]
-        lenL = len(torch.unique(ulabels))
-        for idx in ulabels:
-            label2ft.append(torch.where(ulabels == idx)[0])
-        graphLabel.append(label2ft)
-    featureAll = g.ndata["feat"]
     for epoch in range(info['numEpoch']):
-        totalLoss1 = 0
-        totalLoss2 = 0
-        graphId = 0
+        totalLoss = 0
         for graph in listTrain:
-            label2ft = graphLabel[graphId]
             features = graph.ndata["feat"]
             labels = graph.ndata["label"]
-            posIdx = [random.randint(0,len(label2ft[ii])) for ii in labels]
-            # pos = featureAll[posIdx]
-            negIdx = [random.randint(0,len(label2ft[label2negative(ii, lenL)])) for ii in labels]
-            # neg = featureAll[negIdx]
-            if info['MSE']:
-                labels = convertX2Binary(labels)
+            # labels = convertX2Binary(labels)
             model.train()
-            logits,diff = model(graph, features)
-            pos = logits[posIdx]
-            neg = logits[negIdx]
-            loss1 = loss_fcn1(logits, pos, neg)
-            loss2 = loss_fcn2(diff, torch.zeros(diff.shape).to(device))
-            tloss = loss1 + loss2
-            totalLoss1 += loss1.item()
-            totalLoss2 += loss2.item()
+            logits = model(graph, features)
+            loss = loss_fcn(logits, labels)
+            totalLoss += loss.item()
             optimizer.zero_grad()
-            tloss.backward()
+            loss.backward()
             optimizer.step()
-            graphId += 1
         acc = evaluate(g, masks[0], model)
         acctest = evaluate(g, masks[1], model)
         print(
-            "Epoch {:05d} | Loss1 {:.4f} |Loss2 {:.4f} | Accuracy_train {:.4f} | Accuracy_test {:.4f} ".format(
-                epoch, totalLoss1,totalLoss2, acc, acctest
+            "Epoch {:05d} | Loss {:.4f} | Accuracy_train {:.4f} | Accuracy_test {:.4f} ".format(
+                epoch, totalLoss, acc, acctest
             )
         )
         highestAcc = max(highestAcc, acctest)
@@ -178,7 +162,7 @@ if __name__ == "__main__":
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
-    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl')
+    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='.')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
