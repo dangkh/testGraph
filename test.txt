@@ -902,9 +902,30 @@ Highest Acc: 0.5967345593460631, final Acc 0.5756460121623104
 {'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 37949, 'numTest': 10, 'wFP': False, 'numFP': 5, 'MSE': False}
 Highest Acc: 0.5984141024221823, final Acc 0.5903180895778537
 ********** End **********
-********** INFO **********
-{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 5288, 'numTest': 10, 'wFP': False, 'numFP': 5, 'MSE': False}
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.6014548353664398, final Acc 0.585426213158897
+********** End **********
 ********** INFO **********
 {'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.5930001879618637, final Acc 0.5808977985040146
+********** End **********
 ********** INFO **********
 {'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': False, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.5739412116672129, final Acc 0.5509802857139866
+********** End **********
+
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.5955468141202443, final Acc 0.5634442582989112
+********** End **********
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.6381909908067467, final Acc 0.6218598144999665
+********** End **********
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.6395484977244166, final Acc 0.6304066875405554
+********** End **********
+********** INFO **********
+{'numEpoch': 200, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 5, 'MSE': False}
+Highest Acc: 0.6395484977244166, final Acc 0.6018193255888317
+********** End **********

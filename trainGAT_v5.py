@@ -57,7 +57,7 @@ class GAT_FP(nn.Module):
         gcv = [in_size, 256, 8]
         self.maskFilter = maskFilter(in_size)
         self.num_heads = 4
-        self.GATFP = dglnn.GATConv(in_size,  in_size, activation=F.relu,  residual=False, num_heads = 1)
+        self.GATFP = dglnn.GraphConv(in_size,  in_size,norm='both', weight=True)
         self.gat1 = nn.ModuleList()
         # two-layer GCN
         for ii in range(len(gcv)-1):
@@ -85,8 +85,8 @@ class GAT_FP(nn.Module):
         # print(missIndx)
         # print(features)
         # stop
-        h1 = torch.reshape(h1, (len(h1), -1))
-        h = h + h1 * mask
+        # h1 = torch.reshape(h1, (len(h1), -1))
+        h = h + h1 
         h = self.maskFilter(h)
         h3 = self.gat2(g, h)
         for i, layer in enumerate(self.gat1):
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
-    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='.')
+    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
