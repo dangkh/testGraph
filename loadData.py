@@ -54,7 +54,7 @@ def genMissMultiModal(matSize, percent):
 
 class IEMOCAP(DGLDataset):
     def __init__(self, nameDataset='IEMOCAP', path = './IEMOCAP_features/IEMOCAP_features.pkl',\
-            mergeLabel = False, missing = 0, edgeType = 0, batchSize = 16):
+            mergeLabel = False, missing = 0, edgeType = 0, batchSize = 8):
         self.missing = missing
         self.edgeType = edgeType
         self.path = path

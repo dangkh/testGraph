@@ -57,7 +57,8 @@ class GAT_FP(nn.Module):
         gcv = [in_size, 256, 8]
         self.maskFilter = maskFilter(in_size)
         self.num_heads = 4
-        self.GATFP = dglnn.GraphConv(in_size,  in_size,norm='both', weight=True)
+        # self.GATFP = dglnn.GATv2Conv(in_size,  in_size,  num_heads = 4)
+        self.GATFP = dglnn.GraphConv(in_size,  in_size, norm = 'both', weight=False)
         self.gat1 = nn.ModuleList()
         # two-layer GCN
         for ii in range(len(gcv)-1):
@@ -70,23 +71,16 @@ class GAT_FP(nn.Module):
         self.linear = nn.Linear(gcv[-1] * self.num_heads * 2, out_size)
         # self.linear = nn.Linear(gcv[-1] * self.num_heads * 7, out_size)
         self.dropout = nn.Dropout(0.5)
-        self.wFP = wFP
-        if self.wFP:
-            self.label_propagation = LabelPropagation(k=numFP, alpha=0.5, clamp=False, normalize=True)
 
     def forward(self, g, features):
         h = features.float()
         mask = torch.zeros(h.shape)
-        # if self.wFP:
-        #     h = self.label_propagation(g, features)
-        h1 = self.GATFP(g, h)
         missIndx = torch.where(features==0)
         mask[missIndx] = 1
-        # print(missIndx)
-        # print(features)
-        # stop
-        # h1 = torch.reshape(h1, (len(h1), -1))
-        h = h + h1 
+        h1 = self.GATFP(g, h)
+        # h = 0.5 * (h + h1)
+        h = h + h1
+        # h = F.normalize(h, p=1)
         h = self.maskFilter(h)
         h3 = self.gat2(g, h)
         for i, layer in enumerate(self.gat1):
