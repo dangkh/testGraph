@@ -54,13 +54,14 @@ def genMissMultiModal(matSize, percent):
 
 class IEMOCAP(DGLDataset):
     def __init__(self, nameDataset='IEMOCAP', path = './IEMOCAP_features/IEMOCAP_features.pkl',\
-            mergeLabel = False, missing = 0, edgeType = 0, batchSize = 8):
+            mergeLabel = False, missing = 0, edgeType = 0, batchSize = 8, fullConnect = True):
         self.missing = missing
         self.edgeType = edgeType
         self.path = path
         self.dataset = nameDataset
         self.mergeLabel = mergeLabel
         self.batchSize = batchSize
+        self.fullConnect = fullConnect
         super().__init__(name='dataset_DGL')
 
 
@@ -105,9 +106,13 @@ class IEMOCAP(DGLDataset):
         sim = featureSimilarity(datas[0], datas[-1])
         x1.append(sim)
         x2.append(nodeStart)
-        x3.append(nodeStart+numUtterance-1)
+        x3.append(nodeStart+numUtterance-1)        
         for ii in range(numUtterance - 1):
+            counter = 0
             for jj in range(ii+1, numUtterance):
+                counter += 1
+                if self.fullConnect == False & counter > 2:
+                    break
                 sim = 1
                 if self.edgeType == 0:
                     sim = featureSimilarity(datas[ii], datas[jj])
