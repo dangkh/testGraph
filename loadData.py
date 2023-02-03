@@ -15,7 +15,7 @@ def missingParam(percent):
         for bb in range(1, 200):
             for gg in range(200):
                 if (aa+bb+gg) != 0:
-                    if abs(((bb*3 + gg * 6) * 100.0 / (aa*3 + bb*9 + gg*6)) - percent) <= 1.0:
+                    if abs(((bb*3 + gg * 6) * 100.0 / (aa*9 + bb*9 + gg*9)) - percent) <= 1.0:
                         return aa, bb, gg
     return al, be, ga
 
@@ -29,9 +29,9 @@ def genMissMultiModal(matSize, percent):
         return None
     al, be, ga = missingParam(percent)
     errPecent = 1.7
-    if matSize[-1] <= 5:
+    if matSize[-1] <= 10:
         errPecent = 5
-    if matSize[-1] <= 2:
+    if matSize[-1] <= 3:
         errPecent = 20
     listMask = []
     masks = [np.asarray([[0, 0, 0]]), np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]]), np.asarray([[0, 1, 1], [1, 1, 0], [1, 0, 1]])]
@@ -48,6 +48,7 @@ def genMissMultiModal(matSize, percent):
             tmp = random.randint(0, len(missType)-1)
             mat[:,ii] = missType[tmp]
         missPercent = mat.sum() / (matSize[0] * matSize[-1]) * 100
+        print(missPercent, errPecent, matSize[-1])
         if (np.abs(missPercent - percent) < errPecent) & (np.abs(missPercent - percent) > 0):
             return mat
     return np.zeros((matSize[0], matSize[-1]))
@@ -111,7 +112,7 @@ class IEMOCAP(DGLDataset):
             counter = 0
             for jj in range(ii+1, numUtterance):
                 counter += 1
-                if self.fullConnect == False & counter > 2:
+                if (self.fullConnect == False) & (counter > 2):
                     break
                 sim = 1
                 if self.edgeType == 0:

@@ -141,7 +141,7 @@ if __name__ == "__main__":
     parser.add_argument('--batchSize', help='size of batch', default=1, type=int)
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
-    parser.add_argument('--fullConnect', action='store_true', default=True, help='build graph full connect or not')
+    parser.add_argument('--fullConnect', action='store_true', default=False, help='build graph full connect or not')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
     parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl_2connect/')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)

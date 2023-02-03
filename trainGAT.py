@@ -93,9 +93,10 @@ if __name__ == "__main__":
     parser.add_argument('--numFP', help='number of FP layer', default=5, type=int)
     parser.add_argument('--numTest', help='number of test', default=10, type=int)
     parser.add_argument('--mergeLabel', help='if True then mergeLabel from 6 to 4',action='store_true', default=False)
+    parser.add_argument('--fullConnect', action='store_true', default=False, help='build graph full connect or not')
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
-    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl/')
+    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl_2connect/')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
@@ -114,6 +115,7 @@ if __name__ == "__main__":
             'numTest': args.numTest,
             'wFP': args.wFP,
             'numFP': args.numFP,
+            'fullConnect': args.fullConnect,
             'MSE': args.MSE
         }
 
@@ -141,7 +143,7 @@ if __name__ == "__main__":
             dataPath  = './IEMOCAP_features/IEMOCAP_features.pkl'
             if args.dataset == 'MELD':
                 dataPath  = './MELD_features/MELD_features.pkl'
-            data = IEMOCAP(missing = args.missing, nameDataset = args.dataset, path = dataPath)
+            data = IEMOCAP(missing = args.missing, nameDataset = args.dataset, path = dataPath, fullConnect = args.fullConnect)
             g,_,_ = data[0]
             dgl.save_graphs(graphPath, g)
         print("loaded MM graph")
