@@ -15,6 +15,14 @@ from AttentionInnerModule import *
 # torch.set_default_dtype(torch.float)
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import networkx as nx
+
+def checkMissing(data):
+    if len(np.where(data==0)[0]) > 0:
+        return True
+    return False
 
 class maskFilter(nn.Module):
     def __init__(self, in_size):
@@ -83,12 +91,11 @@ class GAT_FP(nn.Module):
                 h = self.dropout(h)
             h = h.float()
             h = torch.reshape(h, (len(h), -1))
-            h = layer(g, h)
-        
+            h, attention = layer(g, h, True)
         h = torch.reshape(h, (len(h), -1))
         h = torch.cat((h3,h), 1)
         h = self.linear(h)
-        return h
+        return h, attention
 
 
 def train(g, trainSet, testSet, masks, model, info):
@@ -103,6 +110,9 @@ def train(g, trainSet, testSet, masks, model, info):
     highestAcc = 0
     # training loop
     listTrain = dgl.unbatch(trainSet)
+    savedGraph = None
+    savedAtt = None
+    savedFtt = None
     for epoch in range(info['numEpoch']):
         totalLoss = 0
         for graph in listTrain:
@@ -110,7 +120,11 @@ def train(g, trainSet, testSet, masks, model, info):
             labels = graph.ndata["label"]
             # labels = convertX2Binary(labels)
             model.train()
-            logits = model(graph, features)
+            logits, att = model(graph, features)
+            if graph.number_of_nodes() < 10:
+                savedGraph = graph
+                savedAtt = att
+                savedFtt = features
             loss = loss_fcn(logits, labels)
             totalLoss += loss.item()
             optimizer.zero_grad()
@@ -125,7 +139,7 @@ def train(g, trainSet, testSet, masks, model, info):
         )
         highestAcc = max(highestAcc, acctest)
 
-    return highestAcc
+    return highestAcc, savedAtt, savedGraph, savedFtt
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -143,7 +157,7 @@ if __name__ == "__main__":
     parser.add_argument('--log', action='store_true', default=True, help='save experiment info in output')
     parser.add_argument('--fullConnect', action='store_true', default=False, help='build graph full connect or not')
     parser.add_argument('--output', help='savedFile', default='./log.txt')
-    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/dgl_2connect/')
+    parser.add_argument('--prePath', help='prepath to directory contain DGL files', default='F:/dangkh/work/test/')
     parser.add_argument('--MSE', help='reduce variant in laten space',  action='store_true', default=False)
     parser.add_argument( "--dataset",
         type=str,
@@ -223,7 +237,47 @@ if __name__ == "__main__":
         print(model)
         # model training
         print("Training...")
-        highestAcc = train(g, trainSet, testSet, masks, model, info)
+        highestAcc, att, graph, feats = train(g, trainSet, testSet, masks, model, info)
+        graphOriginal = graph
+        graph = graph.cpu().to_networkx()
+        nodes = graph.nodes()
+        paintEdges = graph.in_edges(5)
+        edgesID = [graphOriginal.edge_id(x[0], x[1]) for x in paintEdges]
+        pos = nx.spring_layout(graph, seed=63)  # Seed layout for reproducibility
+        feats = feats.cpu().numpy()
+        lenF = feats.shape[0]
+        for ii in range(lenF):
+            tmp = [0,0,0]
+            line = feats[ii]
+            te = line[:100]
+            au = line[100:442]
+            vi = line[442:]
+            for ind, i in enumerate([te,au,vi]):
+                if checkMissing(i):
+                    tmp[ind] = 1
+            print(tmp)
+        for ii in range(4):
+            colors = att[:,ii,0].clone().detach().cpu().numpy()
+            colors = colors[edgesID]
+            # options = {
+            #     "node_color": "#A0CBE2",
+            #     "edge_color": range(graph.number_of_edges()),
+            #     "edgelist":graph.edges(),
+            #     "width": 2,
+            #     "edge_cmap": plt.cm.Reds,
+            #     "with_labels": True,
+            # }
+            nodes = nx.draw_networkx_nodes(graph,pos,node_color='#A0CBE2')
+            nx.draw_networkx_labels(graph,pos)
+            edges = nx.draw_networkx_edges(graph,pos,edgelist = paintEdges, edge_color=colors,width=2,
+                                           edge_cmap=plt.cm.Reds, arrows = False)
+            plt.colorbar(edges)
+            ax = plt.gca()
+            ax.set_axis_off()
+            plt.show()
+            plt.clf()
+        stop
+
         # test the model
         print("Testing...")
         print(features.shape)

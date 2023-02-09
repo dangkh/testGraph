@@ -141,7 +141,7 @@ def evaluate(g, mask, model):
     features = g.ndata['feat']
     labels = g.ndata['label']
     with torch.no_grad():
-        logits = model(g, features)
+        logits,_ = model(g, features)
         mask = mask.bool()
         # logits = auxilary(logits)
         logits = logits[mask]

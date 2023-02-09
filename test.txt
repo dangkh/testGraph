@@ -1255,3 +1255,197 @@ Highest Acc: 0.6080295346398515, final Acc 0.6001703853250533
 {'numEpoch': 100, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 66, 'seed': 75918, 'numTest': 10, 'wFP': True, 'numFP': 1, 'MSE': False}
 Highest Acc: 0.588112168211475, final Acc 0.5530897171413409
 ********** End **********
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+Highest Acc: 0.604086805650372, final Acc 0.6004333864989994
+********** End **********
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 37949, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 2, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 10, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': False, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 20, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 20, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 20, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 0, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 1, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 20, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 20, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
