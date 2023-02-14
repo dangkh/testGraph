@@ -58,7 +58,7 @@ class GAT_FP(nn.Module):
         self.maskFilter = maskFilter(in_size)
         self.num_heads = 4
         # self.GATFP = dglnn.GATv2Conv(in_size,  in_size,  num_heads = 4)
-        self.GATFP = dglnn.GraphConv(in_size,  in_size, norm = 'both', weight=False)
+        self.GATFP = dglnn.GraphConv(in_size,  in_size, norm = 'both', weight=False, bias = False)
         self.gat1 = nn.ModuleList()
         # two-layer GCN
         for ii in range(len(gcv)-1):
@@ -77,10 +77,16 @@ class GAT_FP(nn.Module):
         mask = torch.zeros(h.shape)
         missIndx = torch.where(features==0)
         mask[missIndx] = 1
-        h1 = self.GATFP(g, h)
-        # h = 0.5 * (h + h1)
-        h = h + h1
-        # h = F.normalize(h, p=1)
+        # h1 = self.GATFP(g, h)
+        meanF = torch.mean(h, 0)
+        meanF = meanF.repeat(len(h), 1)
+        meanF = meanF.double()
+        h1= features.clone()
+        h1[missIndx] =  meanF[missIndx]
+        h = 0.5 * (h + h1)
+        h = h.float()
+        # h = h + h1
+        h = F.normalize(h, p=1)
         h = self.maskFilter(h)
         h3 = self.gat2(g, h)
         for i, layer in enumerate(self.gat1):
@@ -122,7 +128,6 @@ def train(g, trainSet, testSet, masks, model, info):
         for graph in listTrain:
             features = graph.ndata["feat"]
             labels = graph.ndata["label"]
-            # labels = convertX2Binary(labels)
             model.train()
             logits = model(graph, features)
             loss = loss_fcn(logits, labels)
