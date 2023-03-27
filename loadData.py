@@ -17,14 +17,13 @@ def missingParam(percent):
                 if (aa+bb+gg) != 0:
                     if abs(((bb*3 + gg * 6) * 100.0 / (aa*9 + bb*9 + gg*9)) - percent) <= 1.0:
                         return aa, bb, gg
-    return al, be, ga
+    return al, be
 
 
 def genMissMultiModal(matSize, percent):
     index = (percent-10) // 10
     types = np.asarray([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
     missPercent = 0
-    batch_size = 1
     if matSize[0] != len(types[0]):
         return None
     al, be, ga = missingParam(percent)
@@ -53,16 +52,54 @@ def genMissMultiModal(matSize, percent):
             return mat
     return np.zeros((matSize[0], matSize[-1]))
 
+def genMissMultiModal_2modals(matSize, percent):
+    index = (percent-10) // 10
+    types = np.asarray([[0, 1], [1, 0], [0, 0]])
+    missPercent = 0
+    if matSize[0] != len(types[0]):
+        return None
+    al, be = 0, 0
+    for aa in range(1, 200):
+        for bb in range(1, 200):
+            if (aa+bb) != 0:
+                if abs(((bb*2) * 100.0 / (aa*2 + bb*4)) - percent) <= 1.0:
+                    al, be = aa, bb
+                    break
+    errPecent = 1.7
+    if matSize[-1] <= 10:
+        errPecent = 5
+    if matSize[-1] <= 3:
+        errPecent = 20
+    listMask = []
+    masks = [np.asarray([[0, 0]]), np.asarray([[0, 1], [1, 0]])]
+    if percent > 40:
+        masks = [np.asarray([[0, 0]]), np.asarray([[0, 1], [1, 0]] * 4)]
+    for mask, num in ([0, al], [1, be]):
+        if num > 0:
+            listMask.append(np.repeat(masks[mask], num, axis = 0))
+    missType = np.vstack(listMask)
+    counter = 0
+    while np.abs(missPercent - percent) > 1.0:
+        mat = np.zeros((matSize[0], matSize[-1]))
+        for ii in range(matSize[-1]):
+            tmp = random.randint(0, len(missType)-1)
+            mat[:,ii] = missType[tmp]
+        missPercent = mat.sum() / (matSize[0] * matSize[-1]) * 100
+        print(missPercent, errPecent, matSize[-1])
+        if (np.abs(missPercent - percent) < errPecent) & (np.abs(missPercent - percent) > 0):
+            return mat
+    return np.zeros((matSize[0], matSize[-1]))
+
 class IEMOCAP(DGLDataset):
     def __init__(self, nameDataset='IEMOCAP', path = './IEMOCAP_features/IEMOCAP_features.pkl',\
-            mergeLabel = False, missing = 0, edgeType = 0, batchSize = 1, fullConnect = True):
+            mergeLabel = False, missing = 0, edgeType = 0, batchSize = 1, modals= 'avl'):
         self.missing = missing
         self.edgeType = edgeType
         self.path = path
         self.dataset = nameDataset
         self.mergeLabel = mergeLabel
         self.batchSize = batchSize
-        self.fullConnect = fullConnect
+        self.modals = modals
         super().__init__(name='dataset_DGL')
 
 
@@ -73,28 +110,66 @@ class IEMOCAP(DGLDataset):
         speakers = torch.FloatTensor([[1]*5 if x=='M' else [0]*5 for x in x4])
         # 100, 342, 1582, 5
         # 600, 342, 300, 5
-        output = np.hstack([text, audio, video, speakers])
+        if self.modals == 'avl':
+            output = np.hstack([text, audio, video, speakers])
+        else:
+            if self.modals == 'av':
+                output = np.hstack([audio, video, speakers])
+            elif self.modals == 'al':
+                output = np.hstack([text, audio, speakers])
+            else:
+                output = np.hstack([text, video, speakers])
         return output    
 
 
     def extractEdge(self, datas, nodeStart):
         numUtterance = len(datas)
         if self.missing > 0:
-            self.missingMask = genMissMultiModal((3, numUtterance), self.missing)
+            if len(self.modals) == 3: 
+                self.missingMask = genMissMultiModal((len(self.modals), numUtterance), self.missing)
+            else:
+                self.missingMask = genMissMultiModal_2modals((len(self.modals), numUtterance), self.missing)
             for ii in range(numUtterance):
                 currentFeatures = datas[ii]
-                tt, aa, vv  = 100, 442, 2024
-                if self.dataset =="MELD":
-                    tt, aa, vv  = 600, 942, 1242
-                text = currentFeatures[:tt]
-                audio = currentFeatures[tt: aa]
-                video = currentFeatures[aa: vv]
-                if self.missingMask[0][ii] == 1:
-                    text[:] = 0
-                if self.missingMask[1][ii] == 1:
-                    audio[:] = 0
-                if self.missingMask[2][ii] == 1:
-                    video[:] = 0
+                if len(self.modals) == 3:
+                    tt, aa, vv  = 100, 442, 2024
+                    if self.dataset =="MELD":
+                        tt, aa, vv  = 600, 942, 1242
+                    text = currentFeatures[:tt]
+                    audio = currentFeatures[tt: aa]
+                    video = currentFeatures[aa: vv]
+                    if self.missingMask[0][ii] == 1:
+                        text[:] = 0
+                    if self.missingMask[1][ii] == 1:
+                        audio[:] = 0
+                    if self.missingMask[2][ii] == 1:
+                        video[:] = 0
+                else:
+                    if self.modals == 'av':
+                        aa, vv  = 342, 1924
+                        audio = currentFeatures[:aa]
+                        video = currentFeatures[aa: vv]
+                        if self.missingMask[0][ii] == 1:
+                            audio[:] = 0
+                        if self.missingMask[1][ii] == 1:
+                            video[:] = 0
+                    elif self.modals == 'al':
+                        tt, aa = 100, 442
+                        text = currentFeatures[:tt]
+                        audio = currentFeatures[tt: aa]
+                        if self.missingMask[0][ii] == 1:
+                            text[:] = 0
+                        if self.missingMask[1][ii] == 1:
+                            audio[:] = 0
+                    else:
+                        tt, vv = 100, 1682
+                        text = currentFeatures[:tt]
+                        video = currentFeatures[tt: vv]
+                        if self.missingMask[0][ii] == 1:
+                            text[:] = 0
+                        if self.missingMask[1][ii] == 1:
+                            video[:] = 0
+
         x1, x2, x3 = [], [], []
         for ii in range(numUtterance - 1):
             sim = 1
@@ -109,11 +184,7 @@ class IEMOCAP(DGLDataset):
         x2.append(nodeStart)
         x3.append(nodeStart+numUtterance-1)        
         for ii in range(numUtterance - 1):
-            counter = 0
             for jj in range(ii+1, numUtterance):
-                counter += 1
-                if (self.fullConnect == False) & (counter > 2):
-                    break
                 sim = 1
                 if self.edgeType == 0:
                     sim = featureSimilarity(datas[ii], datas[jj])
@@ -235,4 +306,4 @@ class IEMOCAP(DGLDataset):
 # sgTrain, sgTest = trainsetDGL.batched_graph(16)
 # for ii in range(100):
 #     print(ii)
-#     genMissMultiModal((3, ii), 66)
+#     genMissMultiModal_2modals((2, ii), 10)

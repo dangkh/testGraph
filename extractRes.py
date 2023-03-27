@@ -40,7 +40,7 @@ print(varAcc)
 fileNameET = args.csvFile
 if args.exportCsv != 'False':
     with open(fileNameET, mode='w', newline='', encoding='utf-8') as ETfile:
-        orders = ['10', '20', '30', '40', '50', '60', '66']
+        orders = ['0','10', '20', '30', '40', '50']
         acc = [maxAcc[listTypes.index(int(index))] for index in orders]
         var = [varAcc[listTypes.index(int(index))] for index in orders]
         fieldnames = ['Type'] + orders

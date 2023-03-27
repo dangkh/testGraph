@@ -1449,3 +1449,11 @@ Highest Acc: 0.604086805650372, final Acc 0.6004333864989994
 {'numEpoch': 20, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
 ********** INFO **********
 {'numEpoch': 20, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 20, 'seed': 86503, 'numTest': 1, 'wFP': True, 'numFP': 1, 'fullConnect': True, 'MSE': False}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'reconstruct': True, 'modals': 'av'}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'reconstruct': True, 'modals': 'av'}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'reconstruct': True, 'modals': 'av'}
+********** INFO **********
+{'numEpoch': 50, 'lr': 0.0003, 'weight_decay': 1e-05, 'missing': 10, 'seed': 86503, 'numTest': 10, 'wFP': True, 'reconstruct': True, 'modals': 'av'}
